@@ -1,6 +1,6 @@
 DATE = `date +'%y_%m_%d_%H_%M_%S'`
 
-run: main gcc
+run:  clear main gcc
 	./main
 gcc:
 	gcc lex.yy.c -o main
@@ -11,8 +11,8 @@ new:
 	cp main.l ./archive/"main_$(DATE).l"
 	nano main.l
 clear:
-	rm  main
-	rm lex.yy.c
+	rm -f  main
+	rm -f  lex.yy.c
 
 r:
 	r="$RANDOM"
