@@ -12,6 +12,19 @@ DOT       [.]
 SIGN      [+-]
 COMMA     [,]
 SEMICOLON [;]
+ADD       [+]
+SUB       [-]
+MUL       [*]
+DIV       [/]
+
+LT        <
+LE        <=
+GT        >
+GE        >=
+EQ        ==
+NOT       !
+ASSIGN_OP =
+
 
 DIGIT [0-9]
 INTEGER ({DIGIT})+
@@ -52,6 +65,9 @@ SCAN_NEXT         scanNext
 PRINT_OUT         printOut
 
 %%
+{COMMA}      printf("COMMA ");
+{SEMICOLON}  printf("SEMICOLON ");
+
 {DOT} printf("DOT ");
 {LCOM} printf( "LCOM " );
 {RCOM} printf( "RCOM " );
@@ -69,6 +85,24 @@ PRINT_OUT         printOut
 {ELSE}  printf("ELSE ");
 {VOID}  printf("VOID ");
 
+
+{ADD}     printf("ADD ");
+{SUB}     printf("SUB ");
+{MUL}     printf("MUL ");
+{DIV}     printf("DIV ");
+
+
+{GET-HEADINGS} printf("GET-HEADINGS ");
+{GET_ALTITUDE} printf("GET_ALTITUDE ");
+{GET_TEMPERATURE} printf("GET_TEMPERATURE ");
+{SET_VERTICALCLIMB} printf("SET_VERTICALCLIMB ");
+{SET_HORIZONTAL} printf("SET_HORIZONTAL ");
+{SET_HEADING} printf("SET_HEADING ");
+{SET_SPRAY} printf("SET_SPRAY ");
+{CONNECT} printf("CONNECT ");
+{SLEEP} printf("SLEEP ");
+{SCAN_NEXT} printf("SCAN_NEXT ");
+{PRINT_OUT} printf("PRINT_OUT ");
 
    
 {INT}   printf("INT ");
@@ -88,3 +122,12 @@ PRINT_OUT         printOut
 
 {VAR_NAME} printf( "VAR_NAME ");
 {STRING} printf( "STRING ");
+
+{ASSIGN_OP}   printf("ASSIGN_OP ");
+{LT}  printf("LT ");
+{LE}  printf("LE ");
+{GT}  printf("GT ");
+{GE}  printf("GE ");
+{EQ}  printf("EQ ");
+{NOT}  printf("NOT ");
+
