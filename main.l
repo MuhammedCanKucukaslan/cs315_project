@@ -10,27 +10,55 @@ LCOM \/\*
 RCOM \*\/
 DOT [.]
 SIGN [+-]
-DIGIT [0-9]+
 COMMA [,]
 SEMICOLON [;]
 
+DIGIT [0-9]+
+ALPHABETICAL [a-zA-Z]
 
-ALPHABETICAL [a-zA-Z]+ 
-FLOAT {SIGN}?{DIGIT}?{DOT}{DIGIT}
-
+ASCII [!-~]
+STRING_WORD {ASCII}+
+VAR_NAME {ALPHABETICAL}({ALPHABETICAL}|{DIGIT})*
+FLOAT_NUMBER {SIGN}?{DIGIT}?{DOT}{DIGIT}
+COMMENT {LCOM}.*{RCOM}
 
 IF if
 WHILE while
 FOR for
+ELSE else
+VOID void
+
+INT int
+FLOAT float 
+BOOL bool
+STR str
+TRUE true
+FALSE false
+FUNCTION function
+RETURN return
+GETHEADINGS getHeading
+GETALTITUDE getAltitude
+GETTEMPERATURE getTempature
+SETVERTICALCLIMB setVerticalClimb
+SETHORIZONTAL setHorizontal
+SETHEADING setHeading
+SETSPRAY setSpray
+CONNECT connect
+SLEEP sleep
+SCANNEXT scanNext
+PRINTOUT printOut
 
 %%
-{DIGIT} printf("DIGIT(%s) ", yytext);
-{FLOAT}  printf("FLOAT(%s) ", yytext);
-{ALPHABETICAL} printf("ALPHABETICAL ");
 {DOT} printf("DOT ");
 {LCOM} printf( "LCOM " );
 {RCOM} printf( "RCOM " );
 
-IF	printf("IF ");
-ELSE  printf("ELSE ");
+{COMMENT} printf(" <There were some comment> ");
+{FLOAT_NUMBER}  printf("FLOAT_NUMBER(%s) ", yytext);
+{DIGIT} printf("DIGIT(%s) ", yytext);
+{IF} printf( "IF ");
+
+{VAR_NAME} printf( "VAR_NAME ");
+{STRING_WORD} printf( "STRING_WORD ");
+
 

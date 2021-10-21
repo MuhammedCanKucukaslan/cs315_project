@@ -12,7 +12,7 @@ new:
 	nano main.l
 clear:
 	rm  main
-#	rm lex.yy.c
+	rm lex.yy.c
 
 r:
 	r="$RANDOM"
