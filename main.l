@@ -17,6 +17,9 @@ SUB       [-]
 MUL       [*]
 DIV       [/]
 
+SPACE   [ ]
+ANYCHAR .
+
 LT        <
 LE        <=
 GT        >
@@ -130,4 +133,5 @@ PRINT_OUT         printOut
 {GE}  printf("GE ");
 {EQ}  printf("EQ ");
 {NOT}  printf("NOT ");
-
+{SPACE} ;/* ignore the spaces printf("SPACE "); */
+{ANYCHAR} printf("INVALIDCHAR ");
