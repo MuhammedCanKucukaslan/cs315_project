@@ -117,8 +117,8 @@ PRINT_OUT         printOut
 
 
 {COMMENT} printf(" <There were some comment> ");
-{FLOAT_NUMBER}  printf("FLOAT_NUMBER(%s) ", yytext);
-{INTEGER} printf("INTEGER(%s) ", yytext);
+{FLOAT_NUMBER}  printf("FLOAT_NUMBER ");
+{INTEGER} printf("INTEGER ");
 
 {VAR_NAME} printf( "VAR_NAME ");
 {STRING} printf( "STRING ");
