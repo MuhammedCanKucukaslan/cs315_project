@@ -1,0 +1,47 @@
+/*test file 1*/
+
+
+function str setVerticalClimbOrSpray(int tempature){
+	str returnMsg;
+	if(tempature <= 3){
+		int currAltitude = getAltitude();
+		if(currAltitude > 50){
+			setVerticalClimb(currAltitude - 35);
+		}
+		returnMsg = "Altitude decreased due to weather conditions";
+	}else{
+		setSpray(true);
+		returnMsg = "spray is setted to true";
+	}
+	return returnVal;
+}
+
+function void spin(){
+	
+	for( int i = 0; i < 360; i = i + 1){
+		setHorizontal(1);
+	}
+}
+function void zigzag(int value){
+	while(value < 100){
+		if(value / 2 == 0){
+			setHorizontal(1);
+			setHeading(1);
+		}else{
+			setHorizontal(-1);
+			setHeading(0);
+		}
+		value = value + 1;
+	}
+}
+
+
+function void main(){
+	connect("eduroam", "password123");
+	int tempature = getTempature();
+	str message = setVerticalClimbOrSpray(tempature);
+	printOut(message);
+	spin();
+	zigzag();
+	sleep(1);
+}
