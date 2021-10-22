@@ -1,5 +1,6 @@
 /*test file 1*/
-
+/* At first, drone connected to wifi, than action has taken according to weather conditions*/
+/* Then drone spins 360 degrees, finally it drows zig-zags in the field before going to sleep.*/
 
 function str setVerticalClimbOrSpray(int tempature){
 	str returnMsg;
