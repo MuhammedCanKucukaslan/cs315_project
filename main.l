@@ -134,4 +134,3 @@ PRINT_OUT         printOut
 {EQ}  printf("EQ ");
 {NOT}  printf("NOT ");
 {SPACE} ;/* ignore the spaces printf("SPACE "); */
-{ANYCHAR} printf("INVALIDCHAR ");
