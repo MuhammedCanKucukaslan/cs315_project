@@ -35,7 +35,6 @@ STRING_WORD {ASCII}+
 STRING ["][^"]*["]
 VAR_NAME {ALPHABETICAL}({ALPHABETICAL}|{INTEGER})*
 FLOAT_NUMBER {SIGN}?{INTEGER}?{DOT}{INTEGER}
-COMMENT {LCOM}.*{RCOM}
 
 IF    if
 WHILE while
@@ -64,13 +63,17 @@ SLEEP             sleep
 SCAN_NEXT         scanNext
 PRINT_OUT         printOut
 
+%x COMMENT
 %%
 {COMMA}      printf("COMMA ");
 {SEMICOLON}  printf("SEMICOLON ");
 
+"/*"           { BEGIN(COMMENT); printf("<comment_block> ");}
+<COMMENT>"*/" { BEGIN(INITIAL); }
+<COMMENT>\n   { }
+<COMMENT>.    { }
+
 {DOT} printf("DOT ");
-{LCOM} printf( "LCOM " );
-{RCOM} printf( "RCOM " );
 
 {AND} printf("AND ");
 {OR}  printf("OR ");      
@@ -114,9 +117,6 @@ PRINT_OUT         printOut
 {FUNCTION}   printf("FUNCTION ");
 {RETURN}   printf("RETURN ");
 
-
-
-{COMMENT} printf(" <There were some comment> ");
 {FLOAT_NUMBER}  printf("FLOAT_NUMBER ");
 {INTEGER} printf("INTEGER ");
 
