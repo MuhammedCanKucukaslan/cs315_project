@@ -1,4 +1,4 @@
-function floatChange(float val){
+function float floatChange(float val){
 	if(val >= 4 || val <= 2){
 		val = 5.5;
 	}

@@ -71,7 +71,7 @@ PRINT_OUT         printOut
 {COMMA}      printf("COMMA ");
 {SEMICOLON}  printf("SEMICOLON ");
 
-"/*"           { BEGIN(COMMENT); printf("<comment_block> ");}
+"/*"           { BEGIN(COMMENT); printf("COMMENT ");}
 <COMMENT>"*/" { BEGIN(INITIAL); }
 <COMMENT>\n   { }
 <COMMENT>.    { }
