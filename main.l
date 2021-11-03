@@ -1,5 +1,3 @@
-%option main
-
 AND       \&\&
 OR        \|\|
 LP        \(
@@ -17,8 +15,8 @@ SUB       [-]
 MUL       [*]
 DIV       [/]
 
-SPACE   [ ]
-ANYCHAR .
+SPACE     [ ]
+ANYCHAR   .
 
 LT        <
 LE        <=
@@ -29,21 +27,21 @@ NOT       !
 ASSIGN_OP =
 
 
-DIGIT [0-9]
-INTEGER {SIGN}?({DIGIT})+
+DIGIT       [0-9]
+INTEGER      {SIGN}?({DIGIT})+
 ALPHABETICAL [a-zA-Z]
 
-ASCII [!-~]
+ASCII         [!-~]
 STRING_WORD {ASCII}+
-STRING ["][^"]*["]
-VAR_NAME {ALPHABETICAL}({ALPHABETICAL}|{INTEGER})*
+STRING       ["][^"]*["]
+VAR_NAME     {ALPHABETICAL}({ALPHABETICAL}|{INTEGER})*
 FLOAT_NUMBER {SIGN}?{INTEGER}?{DOT}{INTEGER}
 
-IF    if
-WHILE while
-FOR   for
-ELSE  else
-VOID  void
+IF       if
+WHILE    while
+FOR      for
+ELSE     else
+VOID     void
 
 INT      int
 FLOAT    float 
@@ -54,7 +52,7 @@ FALSE    false
 FUNCTION function
 RETURN   return
 
-GET-HEADINGS      getHeading
+GET_HEADINGS      getHeading
 GET_ALTITUDE      getAltitude
 GET_TEMPERATURE   getTempature
 SET_VERTICALCLIMB setVerticalClimb
@@ -68,69 +66,73 @@ PRINT_OUT         printOut
 
 %x COMMENT
 %%
-{COMMA}      printf("COMMA ");
-{SEMICOLON}  printf("SEMICOLON ");
+{COMMA}      return(COMMA);
+{SEMICOLON}  return(SEMICOLON);
 
-"/*"           { BEGIN(COMMENT); printf("COMMENT ");}
+"/*"           { BEGIN(COMMENT); return(COMMENT);}
 <COMMENT>"*/" { BEGIN(INITIAL); }
 <COMMENT>\n   { }
 <COMMENT>.    { }
 
-{DOT} printf("DOT ");
+{DOT} return(DOT);
 
-{AND} printf("AND ");
-{OR}  printf("OR ");      
-{LP}  printf("LP ");     
-{RP}  printf("RP ");      
-{LB}  printf("LB ");     
-{RB}  printf("RB ");      
+{AND} return(AND);
+{OR}  return(OR);      
+{LP}  return(LP);     
+{RP}  return(RP);      
+{LB}  return(LB);     
+{RB}  return(RB);      
 
-{IF}    printf("IF ");
-{WHILE} printf("WHILE ");
-{FOR}   printf("FOR ");
-{ELSE}  printf("ELSE ");
-{VOID}  printf("VOID ");
-
-
-{ADD}     printf("ADD ");
-{SUB}     printf("SUB ");
-{MUL}     printf("MUL ");
-{DIV}     printf("DIV ");
+{IF}    return(IF);
+{WHILE} return(WHILE);
+{FOR}   return(FOR);
+{ELSE}  return(ELSE);
+{VOID}  return(VOID);
 
 
-{GET-HEADINGS} printf("GET-HEADINGS ");
-{GET_ALTITUDE} printf("GET_ALTITUDE ");
-{GET_TEMPERATURE} printf("GET_TEMPERATURE ");
-{SET_VERTICALCLIMB} printf("SET_VERTICALCLIMB ");
-{SET_HORIZONTAL} printf("SET_HORIZONTAL ");
-{SET_HEADING} printf("SET_HEADING ");
-{SET_SPRAY} printf("SET_SPRAY ");
-{CONNECT} printf("CONNECT ");
-{SLEEP} printf("SLEEP ");
-{SCAN_NEXT} printf("SCAN_NEXT ");
-{PRINT_OUT} printf("PRINT_OUT ");
+{ADD}     return(ADD);
+{SUB}     return(SUB);
+{MUL}     return(MUL);
+{DIV}     return(DIV);
+
+
+{GET_HEADINGS} return(GET_HEADINGS);
+{GET_ALTITUDE} return(GET_ALTITUDE);
+{GET_TEMPERATURE} return(GET_TEMPERATURE);
+{SET_VERTICALCLIMB} return(SET_VERTICALCLIMB);
+{SET_HORIZONTAL} return(SET_HORIZONTAL);
+{SET_HEADING} return(SET_HEADING);
+{SET_SPRAY} return(SET_SPRAY);
+{CONNECT} return(CONNECT);
+{SLEEP} return(SLEEP);
+{SCAN_NEXT} return(SCAN_NEXT);
+{PRINT_OUT} return(PRINT_OUT);
 
    
-{INT}   printf("INT ");
-{FLOAT}   printf("FLOAT ");
-{BOOL}   printf("BOOL ");
-{STR}   printf("STR ");
-{TRUE}   printf("TRUE ");
-{FALSE}   printf("FALSE ");
-{FUNCTION}   printf("FUNCTION ");
-{RETURN}   printf("RETURN ");
+{INT}   return (INT);
+{FLOAT}   return(FLOAT);
+{BOOL}   return(BOOL);
+{STR}   return(STR);
+{TRUE}   return(TRUE);
+{FALSE}   return(FALSE);
+{FUNCTION}   return(FUNCTION);
+{RETURN}   return(RETURN);
 
-{FLOAT_NUMBER}  printf("FLOAT_NUMBER ");
-{INTEGER} printf("INTEGER ");
+{FLOAT_NUMBER}  return(FLOAT_NUMBER);
+{INTEGER} return(INTEGER);
 
-{VAR_NAME} printf( "VAR_NAME ");
-{STRING} printf( "STRING ");
+{VAR_NAME} return(VAR_NAME);
+{STRING} return(STRING);
 
-{ASSIGN_OP}   printf("ASSIGN_OP ");
-{LT}  printf("LT ");
-{LE}  printf("LE ");
-{GT}  printf("GT ");
-{GE}  printf("GE ");
-{EQ}  printf("EQ ");
-{NOT}  printf("NOT ");
-{SPACE} ;/* ignore the spaces printf("SPACE "); */
+{ASSIGN_OP}   return(ASSIGN_OP);
+{LT}  return(LT);
+{LE}  return(LE);
+{GT}  return(GT);
+{GE}  return(GE);
+{EQ}  return(EQ);
+{NOT}  return(NOT);
+{SPACE} ;/* ignore the spaces return(SPACE); */
+\n      { extern int lineno; lineno++; 
+        }
+%% 
+int yywrap() { return 1; }
