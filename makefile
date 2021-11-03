@@ -3,14 +3,14 @@ DATE = `date +'%y_%m_%d_%H_%M_%S'`
 
 compile: l y gcc
 	
-run:
+run: compile
 	./main
 gcc:
 	gcc -o main y.tab.c
 lex:
 	lex main_lex.l
 	gcc lex.yy.c -o lex
-	touch main_lex_l
+	touch main_lex.l
 	./lex
 l:
 	lex main.l
