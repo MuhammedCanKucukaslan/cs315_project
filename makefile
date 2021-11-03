@@ -30,3 +30,5 @@ v:
 	cat valid | ./main
 i:
 	cat invalid | ./main
+d:
+	yacc -v main.y
