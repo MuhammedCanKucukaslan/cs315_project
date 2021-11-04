@@ -12,20 +12,21 @@ Terminals unused in grammar
     STRING_WORD
 
 
-Rules useless in parser due to conflicts
-
-   45 BOOLEAN_FACTOR: VALUE
-
-
+State 45 conflicts: 1 reduce/reduce
+State 47 conflicts: 6 reduce/reduce
+State 48 conflicts: 1 reduce/reduce
+State 54 conflicts: 1 reduce/reduce
 State 56 conflicts: 1 shift/reduce
-State 57 conflicts: 1 shift/reduce
-State 61 conflicts: 5 reduce/reduce
-State 98 conflicts: 1 shift/reduce
-State 99 conflicts: 1 shift/reduce
-State 100 conflicts: 3 reduce/reduce
-State 139 conflicts: 1 shift/reduce
-State 143 conflicts: 1 shift/reduce, 2 reduce/reduce
-State 144 conflicts: 3 reduce/reduce
+State 62 conflicts: 5 reduce/reduce
+State 97 conflicts: 1 shift/reduce
+State 98 conflicts: 1 shift/reduce, 2 reduce/reduce
+State 99 conflicts: 1 reduce/reduce
+State 146 conflicts: 1 shift/reduce
+State 151 conflicts: 1 shift/reduce
+State 152 conflicts: 2 shift/reduce
+State 153 conflicts: 1 shift/reduce
+State 183 conflicts: 1 shift/reduce
+State 184 conflicts: 1 shift/reduce
 
 
 Grammar
@@ -65,156 +66,172 @@ Grammar
    23                     | DECLARATIVE_STATEMENT ASSIGN_OP FUNCTION_CALL
 
    24 EXPRESSION: LP EXPRESSION RP
-   25           | LOGICAL_EXPRESSION
-   26           | ARITHMETIC_EXPRESSION
+   25           | LOGICAL_COMPOSITION
+   26           | ARITHMETIC_COMPOSITION
+   27           | VALUE
 
-   27 ARITHMETIC_EXPRESSION: ARITHMETIC_EXPRESSION ADDITIVE_OPERATOR TERM
-   28                      | TERM
+   28 ARITHMETIC_EXPRESSION: ARITHMETIC_COMPOSITION
+   29                      | ARITHMETIC_FACTOR
 
-   29 TERM: TERM MULTIPLICATIVE_OPERATOR FACTOR
-   30     | FACTOR
+   30 ARITHMETIC_FACTOR: VAR_NAME
+   31                  | INTEGER
+   32                  | FLOAT_NUMBER
+   33                  | LP ARITHMETIC_EXPRESSION RP
+   34                  | FUNCTION_CALL
 
-   31 FACTOR: LP ARITHMETIC_EXPRESSION RP
-   32       | VALUE
+   35 ARITHMETIC_COMPOSITION: ARITHMETIC_FACTOR MULTIPLICATIVE_OPERATOR ARITHMETIC_FACTOR
+   36                       | ARITHMETIC_COMPOSITION MULTIPLICATIVE_OPERATOR ARITHMETIC_FACTOR
+   37                       | ARITHMETIC_COMPOSITION MULTIPLICATIVE_OPERATOR ARITHMETIC_TERM
 
-   33 ADDITIVE_OPERATOR: ADD
-   34                  | SUB
+   38 ARITHMETIC_TERM: ARITHMETIC_TERM ADDITIVE_OPERATOR ARITHMETIC_FACTOR
+   39                | ARITHMETIC_FACTOR ADDITIVE_OPERATOR ARITHMETIC_FACTOR
 
-   35 MULTIPLICATIVE_OPERATOR: MUL
-   36                        | DIV
+   40 ADDITIVE_OPERATOR: ADD
+   41                  | SUB
 
-   37 LOGICAL_EXPRESSION: OR_EXPRESSION
+   42 MULTIPLICATIVE_OPERATOR: MUL
+   43                        | DIV
 
-   38 OR_EXPRESSION: OR_EXPRESSION OR AND_EXPRESSION
-   39              | AND_EXPRESSION
+   44 LOGICAL_EXPRESSION: LOGICAL_COMPOSITION
+   45                   | LOGICAL_FACTOR
 
-   40 AND_EXPRESSION: AND_EXPRESSION AND BOOLEAN_FACTOR
-   41               | BOOLEAN_FACTOR
+   46 LOGICAL_FACTOR: VAR_NAME
+   47               | BOOLEAN_VAL
+   48               | RELATIONAL_EXPRESSION
+   49               | NOT LOGICAL_EXPRESSION
+   50               | LP LOGICAL_EXPRESSION RP
+   51               | FUNCTION_CALL
 
-   42 BOOLEAN_FACTOR: NOT BOOLEAN_FACTOR
-   43               | LP OR_EXPRESSION RP
-   44               | RELATIONAL_EXPRESSION
-   45               | VALUE
+   52 LOGICAL_COMPOSITION: LOGICAL_COMP_DUO
+   53                    | LOGICAL_COMPOSITION OR LOGICAL_FACTOR
+   54                    | LOGICAL_COMPOSITION OR LOGICAL_TERM
 
-   46 RELATIONAL_EXPRESSION: ARITHMETIC_EXPRESSION RELATIONAL_OPERATOR ARITHMETIC_EXPRESSION
-   47                      | EQUIVALANCE_EXPRESSION
+   55 LOGICAL_TERM: LOGICAL_TERM_DUO
+   56             | LOGICAL_TERM AND LOGICAL_FACTOR
 
-   48 RELATIONAL_OPERATOR: LT
-   49                    | GT
-   50                    | GE
-   51                    | LE
+   57 LOGICAL_TERM_DUO: LOGICAL_FACTOR AND LOGICAL_FACTOR
 
-   52 EQUIVALANCE_EXPRESSION: EXPRESSION EQ EXPRESSION
+   58 LOGICAL_COMP_DUO: LOGICAL_FACTOR OR LOGICAL_FACTOR
 
-   53 TYPE: PRIMITIVE_TYPE
-   54     | VOID
+   59 RELATIONAL_EXPRESSION: ARITHMETIC_EXPRESSION RELATIONAL_OPERATOR ARITHMETIC_EXPRESSION
+   60                      | EQUIVALANCE_EXPRESSION
 
-   55 PRIMITIVE_TYPE: INT
-   56               | FLOAT
-   57               | BOOL
-   58               | STR
+   61 RELATIONAL_OPERATOR: LT
+   62                    | GT
+   63                    | GE
+   64                    | LE
 
-   59 VALUE: VAR_NAME
-   60      | CONSTANT
+   65 EQUIVALANCE_EXPRESSION: EXPRESSION EQ EXPRESSION
 
-   61 CONSTANT: BOOLEAN_VAL
-   62         | FLOAT_NUMBER
-   63         | INTEGER
-   64         | STRING
+   66 TYPE: PRIMITIVE_TYPE
+   67     | VOID
 
-   65 BOOLEAN_VAL: TRUE
-   66            | FALSE
+   68 PRIMITIVE_TYPE: INT
+   69               | FLOAT
+   70               | BOOL
+   71               | STR
 
-   67 ARGUMENTS: TYPE VAR_NAME
-   68          | ARGUMENTS COMMA TYPE VAR_NAME
+   72 VALUE: VAR_NAME
+   73      | CONSTANT
 
-   69 FUNCTION_DEFINITION: FUNCTION TYPE VAR_NAME LP ARGUMENTS RP LB STATEMENTS RB
-   70                    | FUNCTION TYPE VAR_NAME LP RP LB STATEMENTS RB
+   74 CONSTANT: BOOLEAN_VAL
+   75         | FLOAT_NUMBER
+   76         | INTEGER
+   77         | STRING
 
-   71 PARAMETERS: VALUE
-   72           | PARAMETERS COMMA VALUE
+   78 BOOLEAN_VAL: TRUE
+   79            | FALSE
 
-   73 FUNCTION_CALL: VAR_NAME LP RP
-   74              | VAR_NAME LP PARAMETERS RP
-   75              | PRIMITIVE_FUNCTION_CALL
+   80 ARGUMENTS: TYPE VAR_NAME
+   81          | ARGUMENTS COMMA TYPE VAR_NAME
 
-   76 RETURN_STATEMENT: RETURN EXPRESSION
-   77                 | RETURN FUNCTION_CALL
+   82 FUNCTION_DEFINITION: FUNCTION TYPE VAR_NAME LP ARGUMENTS RP LB STATEMENTS RB
+   83                    | FUNCTION TYPE VAR_NAME LP RP LB STATEMENTS RB
 
-   78 PRIMITIVE_FUNCTION_CALL: GET_HEADINGS LP RP
-   79                        | GET_ALTITUDE LP RP
-   80                        | GET_TEMPERATURE LP RP
-   81                        | SET_VERTICALCLIMB LP ARITHMETIC_EXPRESSION RP
-   82                        | SET_HORIZONTAL LP ARITHMETIC_EXPRESSION RP
-   83                        | SET_HEADING LP LOGICAL_EXPRESSION RP
-   84                        | SET_SPRAY LP LOGICAL_EXPRESSION RP
-   85                        | CONNECT LP STRING COMMA STRING RP
-   86                        | SLEEP LP ARITHMETIC_EXPRESSION RP
-   87                        | SCAN_NEXT LP RP
-   88                        | PRINT_OUT LP EXPRESSION RP
+   84 PARAMETERS: VALUE
+   85           | PARAMETERS COMMA VALUE
+
+   86 FUNCTION_CALL: VAR_NAME LP RP
+   87              | VAR_NAME LP PARAMETERS RP
+   88              | PRIMITIVE_FUNCTION_CALL
+
+   89 RETURN_STATEMENT: RETURN EXPRESSION
+   90                 | RETURN FUNCTION_CALL
+
+   91 PRIMITIVE_FUNCTION_CALL: GET_HEADINGS LP RP
+   92                        | GET_ALTITUDE LP RP
+   93                        | GET_TEMPERATURE LP RP
+   94                        | SET_VERTICALCLIMB LP ARITHMETIC_EXPRESSION RP
+   95                        | SET_HORIZONTAL LP ARITHMETIC_EXPRESSION RP
+   96                        | SET_HEADING LP LOGICAL_EXPRESSION RP
+   97                        | SET_SPRAY LP LOGICAL_EXPRESSION RP
+   98                        | CONNECT LP STRING COMMA STRING RP
+   99                        | SLEEP LP ARITHMETIC_EXPRESSION RP
+  100                        | SCAN_NEXT LP RP
+  101                        | PRINT_OUT LP EXPRESSION RP
 
 
 Terminals, with rules where they appear
 
     $end (0) 0
     error (256)
-    AND (258) 40
-    OR (259) 38
-    LP (260) 7 9 10 18 19 24 31 43 69 70 73 74 78 79 80 81 82 83 84 85 86 87 88
-    RP (261) 7 9 10 18 19 24 31 43 69 70 73 74 78 79 80 81 82 83 84 85 86 87 88
-    LB (262) 12 69 70
-    RB (263) 12 69 70
+    AND (258) 56 57
+    OR (259) 53 54 58
+    LP (260) 7 9 10 18 19 24 33 50 82 83 86 87 91 92 93 94 95 96 97 98 99 100 101
+    RP (261) 7 9 10 18 19 24 33 50 82 83 86 87 91 92 93 94 95 96 97 98 99 100 101
+    LB (262) 12 82 83
+    RB (263) 12 82 83
     LCOM (264)
     RCOM (265)
     DOT (266)
     SIGN (267)
-    COMMA (268) 68 72 85
+    COMMA (268) 81 85 98
     SEMICOLON (269) 13 14 15 16 19
-    ADD (270) 33
-    SUB (271) 34
-    MUL (272) 35
-    DIV (273) 36
+    ADD (270) 40
+    SUB (271) 41
+    MUL (272) 42
+    DIV (273) 43
     SPACE (274)
     ANYCHAR (275)
-    LT (276) 48
-    LE (277) 51
-    GT (278) 49
-    GE (279) 50
-    EQ (280) 52
-    NOT (281) 42
+    LT (276) 61
+    LE (277) 64
+    GT (278) 62
+    GE (279) 63
+    EQ (280) 65
+    NOT (281) 49
     ASSIGN_OP (282) 20 21 22 23
     DIGIT (283)
-    INTEGER (284) 63
+    INTEGER (284) 31 76
     ALPHABETICAL (285)
     ASCII (286)
     STRING_WORD (287)
-    STRING (288) 64 85
-    VAR_NAME (289) 17 20 21 59 67 68 69 70 73 74
-    FLOAT_NUMBER (290) 62
+    STRING (288) 77 98
+    VAR_NAME (289) 17 20 21 30 46 72 80 81 82 83 86 87
+    FLOAT_NUMBER (290) 32 75
     IF (291) 7 9 10
     WHILE (292) 18
     FOR (293) 19
     ELSE (294) 7 10
-    VOID (295) 54
-    INT (296) 55
-    FLOAT (297) 56
-    BOOL (298) 57
-    STR (299) 58
-    TRUE (300) 65
-    FALSE (301) 66
-    FUNCTION (302) 69 70
-    RETURN (303) 76 77
-    GET_HEADINGS (304) 78
-    GET_ALTITUDE (305) 79
-    GET_TEMPERATURE (306) 80
-    SET_VERTICALCLIMB (307) 81
-    SET_HORIZONTAL (308) 82
-    SET_HEADING (309) 83
-    SET_SPRAY (310) 84
-    CONNECT (311) 85
-    SLEEP (312) 86
-    SCAN_NEXT (313) 87
-    PRINT_OUT (314) 88
+    VOID (295) 67
+    INT (296) 68
+    FLOAT (297) 69
+    BOOL (298) 70
+    STR (299) 71
+    TRUE (300) 78
+    FALSE (301) 79
+    FUNCTION (302) 82 83
+    RETURN (303) 89 90
+    GET_HEADINGS (304) 91
+    GET_ALTITUDE (305) 92
+    GET_TEMPERATURE (306) 93
+    SET_VERTICALCLIMB (307) 94
+    SET_HORIZONTAL (308) 95
+    SET_HEADING (309) 96
+    SET_SPRAY (310) 97
+    CONNECT (311) 98
+    SLEEP (312) 99
+    SCAN_NEXT (313) 100
+    PRINT_OUT (314) 101
 
 
 Nonterminals, with rules where they appear
@@ -226,7 +243,7 @@ Nonterminals, with rules where they appear
         on right: 0
     STATEMENTS (62)
         on left: 2 3 4
-        on right: 1 3 4 12 69 70
+        on right: 1 3 4 12 82 83
     STATEMENT (63)
         on left: 5 6
         on right: 2 3 9
@@ -249,77 +266,86 @@ Nonterminals, with rules where they appear
         on left: 20 21 22 23
         on right: 14
     EXPRESSION (70)
-        on left: 24 25 26
-        on right: 20 22 24 52 76 88
+        on left: 24 25 26 27
+        on right: 20 22 24 65 89 101
     ARITHMETIC_EXPRESSION (71)
-        on left: 27 28
-        on right: 26 27 31 46 81 82 86
-    TERM (72)
-        on left: 29 30
-        on right: 27 28 29
-    FACTOR (73)
-        on left: 31 32
-        on right: 29 30
-    ADDITIVE_OPERATOR (74)
-        on left: 33 34
-        on right: 27
-    MULTIPLICATIVE_OPERATOR (75)
-        on left: 35 36
-        on right: 29
-    LOGICAL_EXPRESSION (76)
-        on left: 37
-        on right: 7 9 10 18 19 25 83 84
-    OR_EXPRESSION (77)
+        on left: 28 29
+        on right: 33 59 94 95 99
+    ARITHMETIC_FACTOR (72)
+        on left: 30 31 32 33 34
+        on right: 29 35 36 38 39
+    ARITHMETIC_COMPOSITION (73)
+        on left: 35 36 37
+        on right: 26 28 36 37
+    ARITHMETIC_TERM (74)
         on left: 38 39
-        on right: 37 38 43
-    AND_EXPRESSION (78)
+        on right: 37 38
+    ADDITIVE_OPERATOR (75)
         on left: 40 41
-        on right: 38 39 40
-    BOOLEAN_FACTOR (79)
-        on left: 42 43 44 45
-        on right: 40 41 42
-    RELATIONAL_EXPRESSION (80)
-        on left: 46 47
-        on right: 44
-    RELATIONAL_OPERATOR (81)
-        on left: 48 49 50 51
-        on right: 46
-    EQUIVALANCE_EXPRESSION (82)
-        on left: 52
-        on right: 47
-    TYPE (83)
-        on left: 53 54
-        on right: 17 67 68 69 70
-    PRIMITIVE_TYPE (84)
-        on left: 55 56 57 58
-        on right: 53
-    VALUE (85)
+        on right: 38 39
+    MULTIPLICATIVE_OPERATOR (76)
+        on left: 42 43
+        on right: 35 36 37
+    LOGICAL_EXPRESSION (77)
+        on left: 44 45
+        on right: 7 9 10 18 19 49 50 96 97
+    LOGICAL_FACTOR (78)
+        on left: 46 47 48 49 50 51
+        on right: 45 53 56 57 58
+    LOGICAL_COMPOSITION (79)
+        on left: 52 53 54
+        on right: 25 44 53 54
+    LOGICAL_TERM (80)
+        on left: 55 56
+        on right: 54 56
+    LOGICAL_TERM_DUO (81)
+        on left: 57
+        on right: 55
+    LOGICAL_COMP_DUO (82)
+        on left: 58
+        on right: 52
+    RELATIONAL_EXPRESSION (83)
         on left: 59 60
-        on right: 32 45 71 72
-    CONSTANT (86)
+        on right: 48
+    RELATIONAL_OPERATOR (84)
         on left: 61 62 63 64
+        on right: 59
+    EQUIVALANCE_EXPRESSION (85)
+        on left: 65
         on right: 60
-    BOOLEAN_VAL (87)
-        on left: 65 66
-        on right: 61
-    ARGUMENTS (88)
-        on left: 67 68
-        on right: 68 69
-    FUNCTION_DEFINITION (89)
-        on left: 69 70
+    TYPE (86)
+        on left: 66 67
+        on right: 17 80 81 82 83
+    PRIMITIVE_TYPE (87)
+        on left: 68 69 70 71
+        on right: 66
+    VALUE (88)
+        on left: 72 73
+        on right: 27 84 85
+    CONSTANT (89)
+        on left: 74 75 76 77
+        on right: 73
+    BOOLEAN_VAL (90)
+        on left: 78 79
+        on right: 47 74
+    ARGUMENTS (91)
+        on left: 80 81
+        on right: 81 82
+    FUNCTION_DEFINITION (92)
+        on left: 82 83
         on right: 4
-    PARAMETERS (90)
-        on left: 71 72
-        on right: 72 74
-    FUNCTION_CALL (91)
-        on left: 73 74 75
-        on right: 15 21 23 77
-    RETURN_STATEMENT (92)
-        on left: 76 77
+    PARAMETERS (93)
+        on left: 84 85
+        on right: 85 87
+    FUNCTION_CALL (94)
+        on left: 86 87 88
+        on right: 15 21 23 34 51 90
+    RETURN_STATEMENT (95)
+        on left: 89 90
         on right: 16
-    PRIMITIVE_FUNCTION_CALL (93)
-        on left: 78 79 80 81 82 83 84 85 86 87 88
-        on right: 75
+    PRIMITIVE_FUNCTION_CALL (96)
+        on left: 91 92 93 94 95 96 97 98 99 100 101
+        on right: 88
 
 
 State 0
@@ -411,8 +437,8 @@ State 2
 
    20 ASSIGNMENT_STATEMENT: VAR_NAME . ASSIGN_OP EXPRESSION
    21                     | VAR_NAME . ASSIGN_OP FUNCTION_CALL
-   73 FUNCTION_CALL: VAR_NAME . LP RP
-   74              | VAR_NAME . LP PARAMETERS RP
+   86 FUNCTION_CALL: VAR_NAME . LP RP
+   87              | VAR_NAME . LP PARAMETERS RP
 
     LP         shift, and go to state 38
     ASSIGN_OP  shift, and go to state 39
@@ -443,43 +469,43 @@ State 5
 
 State 6
 
-   54 TYPE: VOID .
+   67 TYPE: VOID .
 
-    $default  reduce using rule 54 (TYPE)
+    $default  reduce using rule 67 (TYPE)
 
 
 State 7
 
-   55 PRIMITIVE_TYPE: INT .
+   68 PRIMITIVE_TYPE: INT .
 
-    $default  reduce using rule 55 (PRIMITIVE_TYPE)
+    $default  reduce using rule 68 (PRIMITIVE_TYPE)
 
 
 State 8
 
-   56 PRIMITIVE_TYPE: FLOAT .
+   69 PRIMITIVE_TYPE: FLOAT .
 
-    $default  reduce using rule 56 (PRIMITIVE_TYPE)
+    $default  reduce using rule 69 (PRIMITIVE_TYPE)
 
 
 State 9
 
-   57 PRIMITIVE_TYPE: BOOL .
+   70 PRIMITIVE_TYPE: BOOL .
 
-    $default  reduce using rule 57 (PRIMITIVE_TYPE)
+    $default  reduce using rule 70 (PRIMITIVE_TYPE)
 
 
 State 10
 
-   58 PRIMITIVE_TYPE: STR .
+   71 PRIMITIVE_TYPE: STR .
 
-    $default  reduce using rule 58 (PRIMITIVE_TYPE)
+    $default  reduce using rule 71 (PRIMITIVE_TYPE)
 
 
 State 11
 
-   76 RETURN_STATEMENT: RETURN . EXPRESSION
-   77                 | RETURN . FUNCTION_CALL
+   89 RETURN_STATEMENT: RETURN . EXPRESSION
+   90                 | RETURN . FUNCTION_CALL
 
     LP                 shift, and go to state 43
     NOT                shift, and go to state 44
@@ -503,103 +529,102 @@ State 11
 
     EXPRESSION               go to state 51
     ARITHMETIC_EXPRESSION    go to state 52
-    TERM                     go to state 53
-    FACTOR                   go to state 54
-    LOGICAL_EXPRESSION       go to state 55
-    OR_EXPRESSION            go to state 56
-    AND_EXPRESSION           go to state 57
-    BOOLEAN_FACTOR           go to state 58
-    RELATIONAL_EXPRESSION    go to state 59
-    EQUIVALANCE_EXPRESSION   go to state 60
-    VALUE                    go to state 61
-    CONSTANT                 go to state 62
-    BOOLEAN_VAL              go to state 63
-    FUNCTION_CALL            go to state 64
+    ARITHMETIC_FACTOR        go to state 53
+    ARITHMETIC_COMPOSITION   go to state 54
+    LOGICAL_FACTOR           go to state 55
+    LOGICAL_COMPOSITION      go to state 56
+    LOGICAL_COMP_DUO         go to state 57
+    RELATIONAL_EXPRESSION    go to state 58
+    EQUIVALANCE_EXPRESSION   go to state 59
+    VALUE                    go to state 60
+    CONSTANT                 go to state 61
+    BOOLEAN_VAL              go to state 62
+    FUNCTION_CALL            go to state 63
     PRIMITIVE_FUNCTION_CALL  go to state 36
 
 
 State 12
 
-   78 PRIMITIVE_FUNCTION_CALL: GET_HEADINGS . LP RP
+   91 PRIMITIVE_FUNCTION_CALL: GET_HEADINGS . LP RP
 
-    LP  shift, and go to state 65
+    LP  shift, and go to state 64
 
 
 State 13
 
-   79 PRIMITIVE_FUNCTION_CALL: GET_ALTITUDE . LP RP
+   92 PRIMITIVE_FUNCTION_CALL: GET_ALTITUDE . LP RP
 
-    LP  shift, and go to state 66
+    LP  shift, and go to state 65
 
 
 State 14
 
-   80 PRIMITIVE_FUNCTION_CALL: GET_TEMPERATURE . LP RP
+   93 PRIMITIVE_FUNCTION_CALL: GET_TEMPERATURE . LP RP
 
-    LP  shift, and go to state 67
+    LP  shift, and go to state 66
 
 
 State 15
 
-   81 PRIMITIVE_FUNCTION_CALL: SET_VERTICALCLIMB . LP ARITHMETIC_EXPRESSION RP
+   94 PRIMITIVE_FUNCTION_CALL: SET_VERTICALCLIMB . LP ARITHMETIC_EXPRESSION RP
 
-    LP  shift, and go to state 68
+    LP  shift, and go to state 67
 
 
 State 16
 
-   82 PRIMITIVE_FUNCTION_CALL: SET_HORIZONTAL . LP ARITHMETIC_EXPRESSION RP
+   95 PRIMITIVE_FUNCTION_CALL: SET_HORIZONTAL . LP ARITHMETIC_EXPRESSION RP
 
-    LP  shift, and go to state 69
+    LP  shift, and go to state 68
 
 
 State 17
 
-   83 PRIMITIVE_FUNCTION_CALL: SET_HEADING . LP LOGICAL_EXPRESSION RP
+   96 PRIMITIVE_FUNCTION_CALL: SET_HEADING . LP LOGICAL_EXPRESSION RP
 
-    LP  shift, and go to state 70
+    LP  shift, and go to state 69
 
 
 State 18
 
-   84 PRIMITIVE_FUNCTION_CALL: SET_SPRAY . LP LOGICAL_EXPRESSION RP
+   97 PRIMITIVE_FUNCTION_CALL: SET_SPRAY . LP LOGICAL_EXPRESSION RP
 
-    LP  shift, and go to state 71
+    LP  shift, and go to state 70
 
 
 State 19
 
-   85 PRIMITIVE_FUNCTION_CALL: CONNECT . LP STRING COMMA STRING RP
+   98 PRIMITIVE_FUNCTION_CALL: CONNECT . LP STRING COMMA STRING RP
 
-    LP  shift, and go to state 72
+    LP  shift, and go to state 71
 
 
 State 20
 
-   86 PRIMITIVE_FUNCTION_CALL: SLEEP . LP ARITHMETIC_EXPRESSION RP
+   99 PRIMITIVE_FUNCTION_CALL: SLEEP . LP ARITHMETIC_EXPRESSION RP
 
-    LP  shift, and go to state 73
+    LP  shift, and go to state 72
 
 
 State 21
 
-   87 PRIMITIVE_FUNCTION_CALL: SCAN_NEXT . LP RP
+  100 PRIMITIVE_FUNCTION_CALL: SCAN_NEXT . LP RP
 
-    LP  shift, and go to state 74
+    LP  shift, and go to state 73
 
 
 State 22
 
-   88 PRIMITIVE_FUNCTION_CALL: PRINT_OUT . LP EXPRESSION RP
+  101 PRIMITIVE_FUNCTION_CALL: PRINT_OUT . LP EXPRESSION RP
 
-    LP  shift, and go to state 75
+    LP  shift, and go to state 74
 
 
 State 23
 
     0 $accept: PROGRAM . $end
 
-    $end  shift, and go to state 76
+    $end  shift, and go to state 75
 
 
 State 24
@@ -618,7 +643,7 @@ State 24
     FLOAT              shift, and go to state 8
     BOOL               shift, and go to state 9
     STR                shift, and go to state 10
-    FUNCTION           shift, and go to state 77
+    FUNCTION           shift, and go to state 76
     RETURN             shift, and go to state 11
     GET_HEADINGS       shift, and go to state 12
     GET_ALTITUDE       shift, and go to state 13
@@ -634,7 +659,7 @@ State 24
 
     $default  reduce using rule 1 (PROGRAM)
 
-    STATEMENT                go to state 78
+    STATEMENT                go to state 77
     MATCHED                  go to state 26
     UNMATCHED                go to state 27
     NON_IF_STATEMENT         go to state 28
@@ -643,7 +668,7 @@ State 24
     ASSIGNMENT_STATEMENT     go to state 31
     TYPE                     go to state 32
     PRIMITIVE_TYPE           go to state 33
-    FUNCTION_DEFINITION      go to state 79
+    FUNCTION_DEFINITION      go to state 78
     FUNCTION_CALL            go to state 34
     RETURN_STATEMENT         go to state 35
     PRIMITIVE_FUNCTION_CALL  go to state 36
@@ -683,8 +708,8 @@ State 29
    22 ASSIGNMENT_STATEMENT: DECLARATIVE_STATEMENT . ASSIGN_OP EXPRESSION
    23                     | DECLARATIVE_STATEMENT . ASSIGN_OP FUNCTION_CALL
 
-    SEMICOLON  shift, and go to state 80
-    ASSIGN_OP  shift, and go to state 81
+    SEMICOLON  shift, and go to state 79
+    ASSIGN_OP  shift, and go to state 80
 
 
 State 30
@@ -698,42 +723,42 @@ State 31
 
    14 NON_IF_STATEMENT: ASSIGNMENT_STATEMENT . SEMICOLON
 
-    SEMICOLON  shift, and go to state 82
+    SEMICOLON  shift, and go to state 81
 
 
 State 32
 
    17 DECLARATIVE_STATEMENT: TYPE . VAR_NAME
 
-    VAR_NAME  shift, and go to state 83
+    VAR_NAME  shift, and go to state 82
 
 
 State 33
 
-   53 TYPE: PRIMITIVE_TYPE .
+   66 TYPE: PRIMITIVE_TYPE .
 
-    $default  reduce using rule 53 (TYPE)
+    $default  reduce using rule 66 (TYPE)
 
 
 State 34
 
    15 NON_IF_STATEMENT: FUNCTION_CALL . SEMICOLON
 
-    SEMICOLON  shift, and go to state 84
+    SEMICOLON  shift, and go to state 83
 
 
 State 35
 
    16 NON_IF_STATEMENT: RETURN_STATEMENT . SEMICOLON
 
-    SEMICOLON  shift, and go to state 85
+    SEMICOLON  shift, and go to state 84
 
 
 State 36
 
-   75 FUNCTION_CALL: PRIMITIVE_FUNCTION_CALL .
+   88 FUNCTION_CALL: PRIMITIVE_FUNCTION_CALL .
 
-    $default  reduce using rule 75 (FUNCTION_CALL)
+    $default  reduce using rule 88 (FUNCTION_CALL)
 
 
 State 37
@@ -743,7 +768,7 @@ State 37
    12 NON_IF_STATEMENT: LB STATEMENTS . RB
 
     LB                 shift, and go to state 1
-    RB                 shift, and go to state 86
+    RB                 shift, and go to state 85
     VAR_NAME           shift, and go to state 2
     IF                 shift, and go to state 3
     WHILE              shift, and go to state 4
@@ -753,7 +778,7 @@ State 37
     FLOAT              shift, and go to state 8
     BOOL               shift, and go to state 9
     STR                shift, and go to state 10
-    FUNCTION           shift, and go to state 77
+    FUNCTION           shift, and go to state 76
     RETURN             shift, and go to state 11
     GET_HEADINGS       shift, and go to state 12
     GET_ALTITUDE       shift, and go to state 13
@@ -767,7 +792,7 @@ State 37
     SCAN_NEXT          shift, and go to state 21
     PRINT_OUT          shift, and go to state 22
 
-    STATEMENT                go to state 78
+    STATEMENT                go to state 77
     MATCHED                  go to state 26
     UNMATCHED                go to state 27
     NON_IF_STATEMENT         go to state 28
@@ -776,7 +801,7 @@ State 37
     ASSIGNMENT_STATEMENT     go to state 31
     TYPE                     go to state 32
     PRIMITIVE_TYPE           go to state 33
-    FUNCTION_DEFINITION      go to state 79
+    FUNCTION_DEFINITION      go to state 78
     FUNCTION_CALL            go to state 34
     RETURN_STATEMENT         go to state 35
     PRIMITIVE_FUNCTION_CALL  go to state 36
@@ -784,21 +809,21 @@ State 37
 
 State 38
 
-   73 FUNCTION_CALL: VAR_NAME LP . RP
-   74              | VAR_NAME LP . PARAMETERS RP
+   86 FUNCTION_CALL: VAR_NAME LP . RP
+   87              | VAR_NAME LP . PARAMETERS RP
 
-    RP            shift, and go to state 87
-    INTEGER       shift, and go to state 45
+    RP            shift, and go to state 86
+    INTEGER       shift, and go to state 87
     STRING        shift, and go to state 46
     VAR_NAME      shift, and go to state 88
-    FLOAT_NUMBER  shift, and go to state 48
+    FLOAT_NUMBER  shift, and go to state 89
     TRUE          shift, and go to state 49
     FALSE         shift, and go to state 50
 
-    VALUE        go to state 89
-    CONSTANT     go to state 62
-    BOOLEAN_VAL  go to state 63
-    PARAMETERS   go to state 90
+    VALUE        go to state 90
+    CONSTANT     go to state 61
+    BOOLEAN_VAL  go to state 91
+    PARAMETERS   go to state 92
 
 
 State 39
@@ -826,20 +851,19 @@ State 39
     SCAN_NEXT          shift, and go to state 21
     PRINT_OUT          shift, and go to state 22
 
-    EXPRESSION               go to state 91
+    EXPRESSION               go to state 93
     ARITHMETIC_EXPRESSION    go to state 52
-    TERM                     go to state 53
-    FACTOR                   go to state 54
-    LOGICAL_EXPRESSION       go to state 55
-    OR_EXPRESSION            go to state 56
-    AND_EXPRESSION           go to state 57
-    BOOLEAN_FACTOR           go to state 58
-    RELATIONAL_EXPRESSION    go to state 59
-    EQUIVALANCE_EXPRESSION   go to state 60
-    VALUE                    go to state 61
-    CONSTANT                 go to state 62
-    BOOLEAN_VAL              go to state 63
-    FUNCTION_CALL            go to state 92
+    ARITHMETIC_FACTOR        go to state 53
+    ARITHMETIC_COMPOSITION   go to state 54
+    LOGICAL_FACTOR           go to state 55
+    LOGICAL_COMPOSITION      go to state 56
+    LOGICAL_COMP_DUO         go to state 57
+    RELATIONAL_EXPRESSION    go to state 58
+    EQUIVALANCE_EXPRESSION   go to state 59
+    VALUE                    go to state 60
+    CONSTANT                 go to state 61
+    BOOLEAN_VAL              go to state 62
+    FUNCTION_CALL            go to state 94
     PRIMITIVE_FUNCTION_CALL  go to state 36
 
 
@@ -849,56 +873,82 @@ State 40
     9 UNMATCHED: IF LP . LOGICAL_EXPRESSION RP STATEMENT
    10          | IF LP . LOGICAL_EXPRESSION RP MATCHED ELSE UNMATCHED
 
-    LP            shift, and go to state 43
-    NOT           shift, and go to state 44
-    INTEGER       shift, and go to state 45
-    STRING        shift, and go to state 46
-    VAR_NAME      shift, and go to state 88
-    FLOAT_NUMBER  shift, and go to state 48
-    TRUE          shift, and go to state 49
-    FALSE         shift, and go to state 50
+    LP                 shift, and go to state 43
+    NOT                shift, and go to state 44
+    INTEGER            shift, and go to state 45
+    STRING             shift, and go to state 46
+    VAR_NAME           shift, and go to state 47
+    FLOAT_NUMBER       shift, and go to state 48
+    TRUE               shift, and go to state 49
+    FALSE              shift, and go to state 50
+    GET_HEADINGS       shift, and go to state 12
+    GET_ALTITUDE       shift, and go to state 13
+    GET_TEMPERATURE    shift, and go to state 14
+    SET_VERTICALCLIMB  shift, and go to state 15
+    SET_HORIZONTAL     shift, and go to state 16
+    SET_HEADING        shift, and go to state 17
+    SET_SPRAY          shift, and go to state 18
+    CONNECT            shift, and go to state 19
+    SLEEP              shift, and go to state 20
+    SCAN_NEXT          shift, and go to state 21
+    PRINT_OUT          shift, and go to state 22
 
-    EXPRESSION              go to state 93
-    ARITHMETIC_EXPRESSION   go to state 52
-    TERM                    go to state 53
-    FACTOR                  go to state 54
-    LOGICAL_EXPRESSION      go to state 94
-    OR_EXPRESSION           go to state 56
-    AND_EXPRESSION          go to state 57
-    BOOLEAN_FACTOR          go to state 58
-    RELATIONAL_EXPRESSION   go to state 59
-    EQUIVALANCE_EXPRESSION  go to state 60
-    VALUE                   go to state 61
-    CONSTANT                go to state 62
-    BOOLEAN_VAL             go to state 63
+    EXPRESSION               go to state 95
+    ARITHMETIC_EXPRESSION    go to state 52
+    ARITHMETIC_FACTOR        go to state 53
+    ARITHMETIC_COMPOSITION   go to state 54
+    LOGICAL_EXPRESSION       go to state 96
+    LOGICAL_FACTOR           go to state 97
+    LOGICAL_COMPOSITION      go to state 98
+    LOGICAL_COMP_DUO         go to state 57
+    RELATIONAL_EXPRESSION    go to state 58
+    EQUIVALANCE_EXPRESSION   go to state 59
+    VALUE                    go to state 60
+    CONSTANT                 go to state 61
+    BOOLEAN_VAL              go to state 62
+    FUNCTION_CALL            go to state 99
+    PRIMITIVE_FUNCTION_CALL  go to state 36
 
 
 State 41
 
    18 ITERATIVE_STATEMENT: WHILE LP . LOGICAL_EXPRESSION RP MATCHED
 
-    LP            shift, and go to state 43
-    NOT           shift, and go to state 44
-    INTEGER       shift, and go to state 45
-    STRING        shift, and go to state 46
-    VAR_NAME      shift, and go to state 88
-    FLOAT_NUMBER  shift, and go to state 48
-    TRUE          shift, and go to state 49
-    FALSE         shift, and go to state 50
+    LP                 shift, and go to state 43
+    NOT                shift, and go to state 44
+    INTEGER            shift, and go to state 45
+    STRING             shift, and go to state 46
+    VAR_NAME           shift, and go to state 47
+    FLOAT_NUMBER       shift, and go to state 48
+    TRUE               shift, and go to state 49
+    FALSE              shift, and go to state 50
+    GET_HEADINGS       shift, and go to state 12
+    GET_ALTITUDE       shift, and go to state 13
+    GET_TEMPERATURE    shift, and go to state 14
+    SET_VERTICALCLIMB  shift, and go to state 15
+    SET_HORIZONTAL     shift, and go to state 16
+    SET_HEADING        shift, and go to state 17
+    SET_SPRAY          shift, and go to state 18
+    CONNECT            shift, and go to state 19
+    SLEEP              shift, and go to state 20
+    SCAN_NEXT          shift, and go to state 21
+    PRINT_OUT          shift, and go to state 22
 
-    EXPRESSION              go to state 93
-    ARITHMETIC_EXPRESSION   go to state 52
-    TERM                    go to state 53
-    FACTOR                  go to state 54
-    LOGICAL_EXPRESSION      go to state 95
-    OR_EXPRESSION           go to state 56
-    AND_EXPRESSION          go to state 57
-    BOOLEAN_FACTOR          go to state 58
-    RELATIONAL_EXPRESSION   go to state 59
-    EQUIVALANCE_EXPRESSION  go to state 60
-    VALUE                   go to state 61
-    CONSTANT                go to state 62
-    BOOLEAN_VAL             go to state 63
+    EXPRESSION               go to state 95
+    ARITHMETIC_EXPRESSION    go to state 52
+    ARITHMETIC_FACTOR        go to state 53
+    ARITHMETIC_COMPOSITION   go to state 54
+    LOGICAL_EXPRESSION       go to state 100
+    LOGICAL_FACTOR           go to state 97
+    LOGICAL_COMPOSITION      go to state 98
+    LOGICAL_COMP_DUO         go to state 57
+    RELATIONAL_EXPRESSION    go to state 58
+    EQUIVALANCE_EXPRESSION   go to state 59
+    VALUE                    go to state 60
+    CONSTANT                 go to state 61
+    BOOLEAN_VAL              go to state 62
+    FUNCTION_CALL            go to state 99
+    PRIMITIVE_FUNCTION_CALL  go to state 36
 
 
 State 42
@@ -927,7 +977,7 @@ State 42
     SCAN_NEXT          shift, and go to state 21
     PRINT_OUT          shift, and go to state 22
 
-    NON_IF_STATEMENT         go to state 96
+    NON_IF_STATEMENT         go to state 101
     DECLARATIVE_STATEMENT    go to state 29
     ITERATIVE_STATEMENT      go to state 30
     ASSIGNMENT_STATEMENT     go to state 31
@@ -941,435 +991,548 @@ State 42
 State 43
 
    24 EXPRESSION: LP . EXPRESSION RP
-   31 FACTOR: LP . ARITHMETIC_EXPRESSION RP
-   43 BOOLEAN_FACTOR: LP . OR_EXPRESSION RP
+   33 ARITHMETIC_FACTOR: LP . ARITHMETIC_EXPRESSION RP
+   50 LOGICAL_FACTOR: LP . LOGICAL_EXPRESSION RP
 
-    LP            shift, and go to state 43
-    NOT           shift, and go to state 44
-    INTEGER       shift, and go to state 45
-    STRING        shift, and go to state 46
-    VAR_NAME      shift, and go to state 88
-    FLOAT_NUMBER  shift, and go to state 48
-    TRUE          shift, and go to state 49
-    FALSE         shift, and go to state 50
+    LP                 shift, and go to state 43
+    NOT                shift, and go to state 44
+    INTEGER            shift, and go to state 45
+    STRING             shift, and go to state 46
+    VAR_NAME           shift, and go to state 47
+    FLOAT_NUMBER       shift, and go to state 48
+    TRUE               shift, and go to state 49
+    FALSE              shift, and go to state 50
+    GET_HEADINGS       shift, and go to state 12
+    GET_ALTITUDE       shift, and go to state 13
+    GET_TEMPERATURE    shift, and go to state 14
+    SET_VERTICALCLIMB  shift, and go to state 15
+    SET_HORIZONTAL     shift, and go to state 16
+    SET_HEADING        shift, and go to state 17
+    SET_SPRAY          shift, and go to state 18
+    CONNECT            shift, and go to state 19
+    SLEEP              shift, and go to state 20
+    SCAN_NEXT          shift, and go to state 21
+    PRINT_OUT          shift, and go to state 22
 
-    EXPRESSION              go to state 97
-    ARITHMETIC_EXPRESSION   go to state 98
-    TERM                    go to state 53
-    FACTOR                  go to state 54
-    LOGICAL_EXPRESSION      go to state 55
-    OR_EXPRESSION           go to state 99
-    AND_EXPRESSION          go to state 57
-    BOOLEAN_FACTOR          go to state 58
-    RELATIONAL_EXPRESSION   go to state 59
-    EQUIVALANCE_EXPRESSION  go to state 60
-    VALUE                   go to state 61
-    CONSTANT                go to state 62
-    BOOLEAN_VAL             go to state 63
+    EXPRESSION               go to state 102
+    ARITHMETIC_EXPRESSION    go to state 103
+    ARITHMETIC_FACTOR        go to state 53
+    ARITHMETIC_COMPOSITION   go to state 54
+    LOGICAL_EXPRESSION       go to state 104
+    LOGICAL_FACTOR           go to state 97
+    LOGICAL_COMPOSITION      go to state 98
+    LOGICAL_COMP_DUO         go to state 57
+    RELATIONAL_EXPRESSION    go to state 58
+    EQUIVALANCE_EXPRESSION   go to state 59
+    VALUE                    go to state 60
+    CONSTANT                 go to state 61
+    BOOLEAN_VAL              go to state 62
+    FUNCTION_CALL            go to state 99
+    PRIMITIVE_FUNCTION_CALL  go to state 36
 
 
 State 44
 
-   42 BOOLEAN_FACTOR: NOT . BOOLEAN_FACTOR
+   49 LOGICAL_FACTOR: NOT . LOGICAL_EXPRESSION
 
-    LP            shift, and go to state 43
-    NOT           shift, and go to state 44
-    INTEGER       shift, and go to state 45
-    STRING        shift, and go to state 46
-    VAR_NAME      shift, and go to state 88
-    FLOAT_NUMBER  shift, and go to state 48
-    TRUE          shift, and go to state 49
-    FALSE         shift, and go to state 50
+    LP                 shift, and go to state 43
+    NOT                shift, and go to state 44
+    INTEGER            shift, and go to state 45
+    STRING             shift, and go to state 46
+    VAR_NAME           shift, and go to state 47
+    FLOAT_NUMBER       shift, and go to state 48
+    TRUE               shift, and go to state 49
+    FALSE              shift, and go to state 50
+    GET_HEADINGS       shift, and go to state 12
+    GET_ALTITUDE       shift, and go to state 13
+    GET_TEMPERATURE    shift, and go to state 14
+    SET_VERTICALCLIMB  shift, and go to state 15
+    SET_HORIZONTAL     shift, and go to state 16
+    SET_HEADING        shift, and go to state 17
+    SET_SPRAY          shift, and go to state 18
+    CONNECT            shift, and go to state 19
+    SLEEP              shift, and go to state 20
+    SCAN_NEXT          shift, and go to state 21
+    PRINT_OUT          shift, and go to state 22
 
-    EXPRESSION              go to state 93
-    ARITHMETIC_EXPRESSION   go to state 52
-    TERM                    go to state 53
-    FACTOR                  go to state 54
-    LOGICAL_EXPRESSION      go to state 55
-    OR_EXPRESSION           go to state 56
-    AND_EXPRESSION          go to state 57
-    BOOLEAN_FACTOR          go to state 100
-    RELATIONAL_EXPRESSION   go to state 59
-    EQUIVALANCE_EXPRESSION  go to state 60
-    VALUE                   go to state 61
-    CONSTANT                go to state 62
-    BOOLEAN_VAL             go to state 63
+    EXPRESSION               go to state 95
+    ARITHMETIC_EXPRESSION    go to state 52
+    ARITHMETIC_FACTOR        go to state 53
+    ARITHMETIC_COMPOSITION   go to state 54
+    LOGICAL_EXPRESSION       go to state 105
+    LOGICAL_FACTOR           go to state 97
+    LOGICAL_COMPOSITION      go to state 98
+    LOGICAL_COMP_DUO         go to state 57
+    RELATIONAL_EXPRESSION    go to state 58
+    EQUIVALANCE_EXPRESSION   go to state 59
+    VALUE                    go to state 60
+    CONSTANT                 go to state 61
+    BOOLEAN_VAL              go to state 62
+    FUNCTION_CALL            go to state 99
+    PRIMITIVE_FUNCTION_CALL  go to state 36
 
 
 State 45
 
-   63 CONSTANT: INTEGER .
+   31 ARITHMETIC_FACTOR: INTEGER .
+   76 CONSTANT: INTEGER .
 
-    $default  reduce using rule 63 (CONSTANT)
+    AND        reduce using rule 76 (CONSTANT)
+    OR         reduce using rule 76 (CONSTANT)
+    RP         reduce using rule 31 (ARITHMETIC_FACTOR)
+    RP         [reduce using rule 76 (CONSTANT)]
+    SEMICOLON  reduce using rule 76 (CONSTANT)
+    EQ         reduce using rule 76 (CONSTANT)
+    $default   reduce using rule 31 (ARITHMETIC_FACTOR)
 
 
 State 46
 
-   64 CONSTANT: STRING .
+   77 CONSTANT: STRING .
 
-    $default  reduce using rule 64 (CONSTANT)
+    $default  reduce using rule 77 (CONSTANT)
 
 
 State 47
 
-   59 VALUE: VAR_NAME .
-   73 FUNCTION_CALL: VAR_NAME . LP RP
-   74              | VAR_NAME . LP PARAMETERS RP
+   30 ARITHMETIC_FACTOR: VAR_NAME .
+   46 LOGICAL_FACTOR: VAR_NAME .
+   72 VALUE: VAR_NAME .
+   86 FUNCTION_CALL: VAR_NAME . LP RP
+   87              | VAR_NAME . LP PARAMETERS RP
 
     LP  shift, and go to state 38
 
-    $default  reduce using rule 59 (VALUE)
+    AND        reduce using rule 46 (LOGICAL_FACTOR)
+    AND        [reduce using rule 72 (VALUE)]
+    OR         reduce using rule 46 (LOGICAL_FACTOR)
+    OR         [reduce using rule 72 (VALUE)]
+    RP         reduce using rule 30 (ARITHMETIC_FACTOR)
+    RP         [reduce using rule 46 (LOGICAL_FACTOR)]
+    RP         [reduce using rule 72 (VALUE)]
+    SEMICOLON  reduce using rule 46 (LOGICAL_FACTOR)
+    SEMICOLON  [reduce using rule 72 (VALUE)]
+    EQ         reduce using rule 46 (LOGICAL_FACTOR)
+    EQ         [reduce using rule 72 (VALUE)]
+    $default   reduce using rule 30 (ARITHMETIC_FACTOR)
 
 
 State 48
 
-   62 CONSTANT: FLOAT_NUMBER .
+   32 ARITHMETIC_FACTOR: FLOAT_NUMBER .
+   75 CONSTANT: FLOAT_NUMBER .
 
-    $default  reduce using rule 62 (CONSTANT)
+    AND        reduce using rule 75 (CONSTANT)
+    OR         reduce using rule 75 (CONSTANT)
+    RP         reduce using rule 32 (ARITHMETIC_FACTOR)
+    RP         [reduce using rule 75 (CONSTANT)]
+    SEMICOLON  reduce using rule 75 (CONSTANT)
+    EQ         reduce using rule 75 (CONSTANT)
+    $default   reduce using rule 32 (ARITHMETIC_FACTOR)
 
 
 State 49
 
-   65 BOOLEAN_VAL: TRUE .
+   78 BOOLEAN_VAL: TRUE .
 
-    $default  reduce using rule 65 (BOOLEAN_VAL)
+    $default  reduce using rule 78 (BOOLEAN_VAL)
 
 
 State 50
 
-   66 BOOLEAN_VAL: FALSE .
+   79 BOOLEAN_VAL: FALSE .
 
-    $default  reduce using rule 66 (BOOLEAN_VAL)
+    $default  reduce using rule 79 (BOOLEAN_VAL)
 
 
 State 51
 
-   52 EQUIVALANCE_EXPRESSION: EXPRESSION . EQ EXPRESSION
-   76 RETURN_STATEMENT: RETURN EXPRESSION .
+   65 EQUIVALANCE_EXPRESSION: EXPRESSION . EQ EXPRESSION
+   89 RETURN_STATEMENT: RETURN EXPRESSION .
 
-    EQ  shift, and go to state 101
+    EQ  shift, and go to state 106
 
-    $default  reduce using rule 76 (RETURN_STATEMENT)
+    $default  reduce using rule 89 (RETURN_STATEMENT)
 
 
 State 52
 
-   26 EXPRESSION: ARITHMETIC_EXPRESSION .
-   27 ARITHMETIC_EXPRESSION: ARITHMETIC_EXPRESSION . ADDITIVE_OPERATOR TERM
-   46 RELATIONAL_EXPRESSION: ARITHMETIC_EXPRESSION . RELATIONAL_OPERATOR ARITHMETIC_EXPRESSION
+   59 RELATIONAL_EXPRESSION: ARITHMETIC_EXPRESSION . RELATIONAL_OPERATOR ARITHMETIC_EXPRESSION
 
-    ADD  shift, and go to state 102
-    SUB  shift, and go to state 103
-    LT   shift, and go to state 104
-    LE   shift, and go to state 105
-    GT   shift, and go to state 106
-    GE   shift, and go to state 107
+    LT  shift, and go to state 107
+    LE  shift, and go to state 108
+    GT  shift, and go to state 109
+    GE  shift, and go to state 110
 
-    $default  reduce using rule 26 (EXPRESSION)
-
-    ADDITIVE_OPERATOR    go to state 108
-    RELATIONAL_OPERATOR  go to state 109
+    RELATIONAL_OPERATOR  go to state 111
 
 
 State 53
 
-   28 ARITHMETIC_EXPRESSION: TERM .
-   29 TERM: TERM . MULTIPLICATIVE_OPERATOR FACTOR
+   29 ARITHMETIC_EXPRESSION: ARITHMETIC_FACTOR .
+   35 ARITHMETIC_COMPOSITION: ARITHMETIC_FACTOR . MULTIPLICATIVE_OPERATOR ARITHMETIC_FACTOR
 
-    MUL  shift, and go to state 110
-    DIV  shift, and go to state 111
+    MUL  shift, and go to state 112
+    DIV  shift, and go to state 113
 
-    $default  reduce using rule 28 (ARITHMETIC_EXPRESSION)
+    $default  reduce using rule 29 (ARITHMETIC_EXPRESSION)
 
-    MULTIPLICATIVE_OPERATOR  go to state 112
+    MULTIPLICATIVE_OPERATOR  go to state 114
 
 
 State 54
 
-   30 TERM: FACTOR .
+   26 EXPRESSION: ARITHMETIC_COMPOSITION .
+   28 ARITHMETIC_EXPRESSION: ARITHMETIC_COMPOSITION .
+   36 ARITHMETIC_COMPOSITION: ARITHMETIC_COMPOSITION . MULTIPLICATIVE_OPERATOR ARITHMETIC_FACTOR
+   37                       | ARITHMETIC_COMPOSITION . MULTIPLICATIVE_OPERATOR ARITHMETIC_TERM
 
-    $default  reduce using rule 30 (TERM)
+    MUL  shift, and go to state 112
+    DIV  shift, and go to state 113
+
+    RP        reduce using rule 26 (EXPRESSION)
+    RP        [reduce using rule 28 (ARITHMETIC_EXPRESSION)]
+    LT        reduce using rule 28 (ARITHMETIC_EXPRESSION)
+    LE        reduce using rule 28 (ARITHMETIC_EXPRESSION)
+    GT        reduce using rule 28 (ARITHMETIC_EXPRESSION)
+    GE        reduce using rule 28 (ARITHMETIC_EXPRESSION)
+    $default  reduce using rule 26 (EXPRESSION)
+
+    MULTIPLICATIVE_OPERATOR  go to state 115
 
 
 State 55
 
-   25 EXPRESSION: LOGICAL_EXPRESSION .
+   58 LOGICAL_COMP_DUO: LOGICAL_FACTOR . OR LOGICAL_FACTOR
 
-    $default  reduce using rule 25 (EXPRESSION)
+    OR  shift, and go to state 116
 
 
 State 56
 
-   37 LOGICAL_EXPRESSION: OR_EXPRESSION .
-   38 OR_EXPRESSION: OR_EXPRESSION . OR AND_EXPRESSION
+   25 EXPRESSION: LOGICAL_COMPOSITION .
+   53 LOGICAL_COMPOSITION: LOGICAL_COMPOSITION . OR LOGICAL_FACTOR
+   54                    | LOGICAL_COMPOSITION . OR LOGICAL_TERM
 
-    OR  shift, and go to state 113
+    OR  shift, and go to state 117
 
-    OR        [reduce using rule 37 (LOGICAL_EXPRESSION)]
-    $default  reduce using rule 37 (LOGICAL_EXPRESSION)
+    OR        [reduce using rule 25 (EXPRESSION)]
+    $default  reduce using rule 25 (EXPRESSION)
 
 
 State 57
 
-   39 OR_EXPRESSION: AND_EXPRESSION .
-   40 AND_EXPRESSION: AND_EXPRESSION . AND BOOLEAN_FACTOR
+   52 LOGICAL_COMPOSITION: LOGICAL_COMP_DUO .
 
-    AND  shift, and go to state 114
-
-    AND       [reduce using rule 39 (OR_EXPRESSION)]
-    $default  reduce using rule 39 (OR_EXPRESSION)
+    $default  reduce using rule 52 (LOGICAL_COMPOSITION)
 
 
 State 58
 
-   41 AND_EXPRESSION: BOOLEAN_FACTOR .
+   48 LOGICAL_FACTOR: RELATIONAL_EXPRESSION .
 
-    $default  reduce using rule 41 (AND_EXPRESSION)
+    $default  reduce using rule 48 (LOGICAL_FACTOR)
 
 
 State 59
 
-   44 BOOLEAN_FACTOR: RELATIONAL_EXPRESSION .
+   60 RELATIONAL_EXPRESSION: EQUIVALANCE_EXPRESSION .
 
-    $default  reduce using rule 44 (BOOLEAN_FACTOR)
+    $default  reduce using rule 60 (RELATIONAL_EXPRESSION)
 
 
 State 60
 
-   47 RELATIONAL_EXPRESSION: EQUIVALANCE_EXPRESSION .
+   27 EXPRESSION: VALUE .
 
-    $default  reduce using rule 47 (RELATIONAL_EXPRESSION)
+    $default  reduce using rule 27 (EXPRESSION)
 
 
 State 61
 
-   32 FACTOR: VALUE .
-   45 BOOLEAN_FACTOR: VALUE .
+   73 VALUE: CONSTANT .
 
-    AND        reduce using rule 32 (FACTOR)
-    AND        [reduce using rule 45 (BOOLEAN_FACTOR)]
-    OR         reduce using rule 32 (FACTOR)
-    OR         [reduce using rule 45 (BOOLEAN_FACTOR)]
-    RP         reduce using rule 32 (FACTOR)
-    RP         [reduce using rule 45 (BOOLEAN_FACTOR)]
-    SEMICOLON  reduce using rule 32 (FACTOR)
-    SEMICOLON  [reduce using rule 45 (BOOLEAN_FACTOR)]
-    EQ         reduce using rule 32 (FACTOR)
-    EQ         [reduce using rule 45 (BOOLEAN_FACTOR)]
-    $default   reduce using rule 32 (FACTOR)
+    $default  reduce using rule 73 (VALUE)
 
 
 State 62
 
-   60 VALUE: CONSTANT .
+   47 LOGICAL_FACTOR: BOOLEAN_VAL .
+   74 CONSTANT: BOOLEAN_VAL .
 
-    $default  reduce using rule 60 (VALUE)
+    AND        reduce using rule 47 (LOGICAL_FACTOR)
+    AND        [reduce using rule 74 (CONSTANT)]
+    OR         reduce using rule 47 (LOGICAL_FACTOR)
+    OR         [reduce using rule 74 (CONSTANT)]
+    RP         reduce using rule 47 (LOGICAL_FACTOR)
+    RP         [reduce using rule 74 (CONSTANT)]
+    SEMICOLON  reduce using rule 47 (LOGICAL_FACTOR)
+    SEMICOLON  [reduce using rule 74 (CONSTANT)]
+    EQ         reduce using rule 47 (LOGICAL_FACTOR)
+    EQ         [reduce using rule 74 (CONSTANT)]
+    $default   reduce using rule 47 (LOGICAL_FACTOR)
 
 
 State 63
 
-   61 CONSTANT: BOOLEAN_VAL .
+   34 ARITHMETIC_FACTOR: FUNCTION_CALL .
+   51 LOGICAL_FACTOR: FUNCTION_CALL .
+   90 RETURN_STATEMENT: RETURN FUNCTION_CALL .
 
-    $default  reduce using rule 61 (CONSTANT)
+    OR         reduce using rule 51 (LOGICAL_FACTOR)
+    SEMICOLON  reduce using rule 90 (RETURN_STATEMENT)
+    $default   reduce using rule 34 (ARITHMETIC_FACTOR)
 
 
 State 64
 
-   77 RETURN_STATEMENT: RETURN FUNCTION_CALL .
+   91 PRIMITIVE_FUNCTION_CALL: GET_HEADINGS LP . RP
 
-    $default  reduce using rule 77 (RETURN_STATEMENT)
+    RP  shift, and go to state 118
 
 
 State 65
 
-   78 PRIMITIVE_FUNCTION_CALL: GET_HEADINGS LP . RP
+   92 PRIMITIVE_FUNCTION_CALL: GET_ALTITUDE LP . RP
 
-    RP  shift, and go to state 115
+    RP  shift, and go to state 119
 
 
 State 66
 
-   79 PRIMITIVE_FUNCTION_CALL: GET_ALTITUDE LP . RP
+   93 PRIMITIVE_FUNCTION_CALL: GET_TEMPERATURE LP . RP
 
-    RP  shift, and go to state 116
+    RP  shift, and go to state 120
 
 
 State 67
 
-   80 PRIMITIVE_FUNCTION_CALL: GET_TEMPERATURE LP . RP
+   94 PRIMITIVE_FUNCTION_CALL: SET_VERTICALCLIMB LP . ARITHMETIC_EXPRESSION RP
 
-    RP  shift, and go to state 117
+    LP                 shift, and go to state 121
+    INTEGER            shift, and go to state 122
+    VAR_NAME           shift, and go to state 123
+    FLOAT_NUMBER       shift, and go to state 124
+    GET_HEADINGS       shift, and go to state 12
+    GET_ALTITUDE       shift, and go to state 13
+    GET_TEMPERATURE    shift, and go to state 14
+    SET_VERTICALCLIMB  shift, and go to state 15
+    SET_HORIZONTAL     shift, and go to state 16
+    SET_HEADING        shift, and go to state 17
+    SET_SPRAY          shift, and go to state 18
+    CONNECT            shift, and go to state 19
+    SLEEP              shift, and go to state 20
+    SCAN_NEXT          shift, and go to state 21
+    PRINT_OUT          shift, and go to state 22
+
+    ARITHMETIC_EXPRESSION    go to state 125
+    ARITHMETIC_FACTOR        go to state 53
+    ARITHMETIC_COMPOSITION   go to state 126
+    FUNCTION_CALL            go to state 127
+    PRIMITIVE_FUNCTION_CALL  go to state 36
 
 
 State 68
 
-   81 PRIMITIVE_FUNCTION_CALL: SET_VERTICALCLIMB LP . ARITHMETIC_EXPRESSION RP
+   95 PRIMITIVE_FUNCTION_CALL: SET_HORIZONTAL LP . ARITHMETIC_EXPRESSION RP
 
-    LP            shift, and go to state 118
-    INTEGER       shift, and go to state 45
-    STRING        shift, and go to state 46
-    VAR_NAME      shift, and go to state 88
-    FLOAT_NUMBER  shift, and go to state 48
-    TRUE          shift, and go to state 49
-    FALSE         shift, and go to state 50
+    LP                 shift, and go to state 121
+    INTEGER            shift, and go to state 122
+    VAR_NAME           shift, and go to state 123
+    FLOAT_NUMBER       shift, and go to state 124
+    GET_HEADINGS       shift, and go to state 12
+    GET_ALTITUDE       shift, and go to state 13
+    GET_TEMPERATURE    shift, and go to state 14
+    SET_VERTICALCLIMB  shift, and go to state 15
+    SET_HORIZONTAL     shift, and go to state 16
+    SET_HEADING        shift, and go to state 17
+    SET_SPRAY          shift, and go to state 18
+    CONNECT            shift, and go to state 19
+    SLEEP              shift, and go to state 20
+    SCAN_NEXT          shift, and go to state 21
+    PRINT_OUT          shift, and go to state 22
 
-    ARITHMETIC_EXPRESSION  go to state 119
-    TERM                   go to state 53
-    FACTOR                 go to state 54
-    VALUE                  go to state 120
-    CONSTANT               go to state 62
-    BOOLEAN_VAL            go to state 63
+    ARITHMETIC_EXPRESSION    go to state 128
+    ARITHMETIC_FACTOR        go to state 53
+    ARITHMETIC_COMPOSITION   go to state 126
+    FUNCTION_CALL            go to state 127
+    PRIMITIVE_FUNCTION_CALL  go to state 36
 
 
 State 69
 
-   82 PRIMITIVE_FUNCTION_CALL: SET_HORIZONTAL LP . ARITHMETIC_EXPRESSION RP
+   96 PRIMITIVE_FUNCTION_CALL: SET_HEADING LP . LOGICAL_EXPRESSION RP
 
-    LP            shift, and go to state 118
-    INTEGER       shift, and go to state 45
-    STRING        shift, and go to state 46
-    VAR_NAME      shift, and go to state 88
-    FLOAT_NUMBER  shift, and go to state 48
-    TRUE          shift, and go to state 49
-    FALSE         shift, and go to state 50
+    LP                 shift, and go to state 43
+    NOT                shift, and go to state 44
+    INTEGER            shift, and go to state 45
+    STRING             shift, and go to state 46
+    VAR_NAME           shift, and go to state 47
+    FLOAT_NUMBER       shift, and go to state 48
+    TRUE               shift, and go to state 49
+    FALSE              shift, and go to state 50
+    GET_HEADINGS       shift, and go to state 12
+    GET_ALTITUDE       shift, and go to state 13
+    GET_TEMPERATURE    shift, and go to state 14
+    SET_VERTICALCLIMB  shift, and go to state 15
+    SET_HORIZONTAL     shift, and go to state 16
+    SET_HEADING        shift, and go to state 17
+    SET_SPRAY          shift, and go to state 18
+    CONNECT            shift, and go to state 19
+    SLEEP              shift, and go to state 20
+    SCAN_NEXT          shift, and go to state 21
+    PRINT_OUT          shift, and go to state 22
 
-    ARITHMETIC_EXPRESSION  go to state 121
-    TERM                   go to state 53
-    FACTOR                 go to state 54
-    VALUE                  go to state 120
-    CONSTANT               go to state 62
-    BOOLEAN_VAL            go to state 63
+    EXPRESSION               go to state 95
+    ARITHMETIC_EXPRESSION    go to state 52
+    ARITHMETIC_FACTOR        go to state 53
+    ARITHMETIC_COMPOSITION   go to state 54
+    LOGICAL_EXPRESSION       go to state 129
+    LOGICAL_FACTOR           go to state 97
+    LOGICAL_COMPOSITION      go to state 98
+    LOGICAL_COMP_DUO         go to state 57
+    RELATIONAL_EXPRESSION    go to state 58
+    EQUIVALANCE_EXPRESSION   go to state 59
+    VALUE                    go to state 60
+    CONSTANT                 go to state 61
+    BOOLEAN_VAL              go to state 62
+    FUNCTION_CALL            go to state 99
+    PRIMITIVE_FUNCTION_CALL  go to state 36
 
 
 State 70
 
-   83 PRIMITIVE_FUNCTION_CALL: SET_HEADING LP . LOGICAL_EXPRESSION RP
+   97 PRIMITIVE_FUNCTION_CALL: SET_SPRAY LP . LOGICAL_EXPRESSION RP
 
-    LP            shift, and go to state 43
-    NOT           shift, and go to state 44
-    INTEGER       shift, and go to state 45
-    STRING        shift, and go to state 46
-    VAR_NAME      shift, and go to state 88
-    FLOAT_NUMBER  shift, and go to state 48
-    TRUE          shift, and go to state 49
-    FALSE         shift, and go to state 50
+    LP                 shift, and go to state 43
+    NOT                shift, and go to state 44
+    INTEGER            shift, and go to state 45
+    STRING             shift, and go to state 46
+    VAR_NAME           shift, and go to state 47
+    FLOAT_NUMBER       shift, and go to state 48
+    TRUE               shift, and go to state 49
+    FALSE              shift, and go to state 50
+    GET_HEADINGS       shift, and go to state 12
+    GET_ALTITUDE       shift, and go to state 13
+    GET_TEMPERATURE    shift, and go to state 14
+    SET_VERTICALCLIMB  shift, and go to state 15
+    SET_HORIZONTAL     shift, and go to state 16
+    SET_HEADING        shift, and go to state 17
+    SET_SPRAY          shift, and go to state 18
+    CONNECT            shift, and go to state 19
+    SLEEP              shift, and go to state 20
+    SCAN_NEXT          shift, and go to state 21
+    PRINT_OUT          shift, and go to state 22
 
-    EXPRESSION              go to state 93
-    ARITHMETIC_EXPRESSION   go to state 52
-    TERM                    go to state 53
-    FACTOR                  go to state 54
-    LOGICAL_EXPRESSION      go to state 122
-    OR_EXPRESSION           go to state 56
-    AND_EXPRESSION          go to state 57
-    BOOLEAN_FACTOR          go to state 58
-    RELATIONAL_EXPRESSION   go to state 59
-    EQUIVALANCE_EXPRESSION  go to state 60
-    VALUE                   go to state 61
-    CONSTANT                go to state 62
-    BOOLEAN_VAL             go to state 63
+    EXPRESSION               go to state 95
+    ARITHMETIC_EXPRESSION    go to state 52
+    ARITHMETIC_FACTOR        go to state 53
+    ARITHMETIC_COMPOSITION   go to state 54
+    LOGICAL_EXPRESSION       go to state 130
+    LOGICAL_FACTOR           go to state 97
+    LOGICAL_COMPOSITION      go to state 98
+    LOGICAL_COMP_DUO         go to state 57
+    RELATIONAL_EXPRESSION    go to state 58
+    EQUIVALANCE_EXPRESSION   go to state 59
+    VALUE                    go to state 60
+    CONSTANT                 go to state 61
+    BOOLEAN_VAL              go to state 62
+    FUNCTION_CALL            go to state 99
+    PRIMITIVE_FUNCTION_CALL  go to state 36
 
 
 State 71
 
-   84 PRIMITIVE_FUNCTION_CALL: SET_SPRAY LP . LOGICAL_EXPRESSION RP
+   98 PRIMITIVE_FUNCTION_CALL: CONNECT LP . STRING COMMA STRING RP
 
-    LP            shift, and go to state 43
-    NOT           shift, and go to state 44
-    INTEGER       shift, and go to state 45
-    STRING        shift, and go to state 46
-    VAR_NAME      shift, and go to state 88
-    FLOAT_NUMBER  shift, and go to state 48
-    TRUE          shift, and go to state 49
-    FALSE         shift, and go to state 50
-
-    EXPRESSION              go to state 93
-    ARITHMETIC_EXPRESSION   go to state 52
-    TERM                    go to state 53
-    FACTOR                  go to state 54
-    LOGICAL_EXPRESSION      go to state 123
-    OR_EXPRESSION           go to state 56
-    AND_EXPRESSION          go to state 57
-    BOOLEAN_FACTOR          go to state 58
-    RELATIONAL_EXPRESSION   go to state 59
-    EQUIVALANCE_EXPRESSION  go to state 60
-    VALUE                   go to state 61
-    CONSTANT                go to state 62
-    BOOLEAN_VAL             go to state 63
+    STRING  shift, and go to state 131
 
 
 State 72
 
-   85 PRIMITIVE_FUNCTION_CALL: CONNECT LP . STRING COMMA STRING RP
+   99 PRIMITIVE_FUNCTION_CALL: SLEEP LP . ARITHMETIC_EXPRESSION RP
 
-    STRING  shift, and go to state 124
+    LP                 shift, and go to state 121
+    INTEGER            shift, and go to state 122
+    VAR_NAME           shift, and go to state 123
+    FLOAT_NUMBER       shift, and go to state 124
+    GET_HEADINGS       shift, and go to state 12
+    GET_ALTITUDE       shift, and go to state 13
+    GET_TEMPERATURE    shift, and go to state 14
+    SET_VERTICALCLIMB  shift, and go to state 15
+    SET_HORIZONTAL     shift, and go to state 16
+    SET_HEADING        shift, and go to state 17
+    SET_SPRAY          shift, and go to state 18
+    CONNECT            shift, and go to state 19
+    SLEEP              shift, and go to state 20
+    SCAN_NEXT          shift, and go to state 21
+    PRINT_OUT          shift, and go to state 22
+
+    ARITHMETIC_EXPRESSION    go to state 132
+    ARITHMETIC_FACTOR        go to state 53
+    ARITHMETIC_COMPOSITION   go to state 126
+    FUNCTION_CALL            go to state 127
+    PRIMITIVE_FUNCTION_CALL  go to state 36
 
 
 State 73
 
-   86 PRIMITIVE_FUNCTION_CALL: SLEEP LP . ARITHMETIC_EXPRESSION RP
+  100 PRIMITIVE_FUNCTION_CALL: SCAN_NEXT LP . RP
 
-    LP            shift, and go to state 118
-    INTEGER       shift, and go to state 45
-    STRING        shift, and go to state 46
-    VAR_NAME      shift, and go to state 88
-    FLOAT_NUMBER  shift, and go to state 48
-    TRUE          shift, and go to state 49
-    FALSE         shift, and go to state 50
-
-    ARITHMETIC_EXPRESSION  go to state 125
-    TERM                   go to state 53
-    FACTOR                 go to state 54
-    VALUE                  go to state 120
-    CONSTANT               go to state 62
-    BOOLEAN_VAL            go to state 63
+    RP  shift, and go to state 133
 
 
 State 74
 
-   87 PRIMITIVE_FUNCTION_CALL: SCAN_NEXT LP . RP
+  101 PRIMITIVE_FUNCTION_CALL: PRINT_OUT LP . EXPRESSION RP
 
-    RP  shift, and go to state 126
+    LP                 shift, and go to state 43
+    NOT                shift, and go to state 44
+    INTEGER            shift, and go to state 45
+    STRING             shift, and go to state 46
+    VAR_NAME           shift, and go to state 47
+    FLOAT_NUMBER       shift, and go to state 48
+    TRUE               shift, and go to state 49
+    FALSE              shift, and go to state 50
+    GET_HEADINGS       shift, and go to state 12
+    GET_ALTITUDE       shift, and go to state 13
+    GET_TEMPERATURE    shift, and go to state 14
+    SET_VERTICALCLIMB  shift, and go to state 15
+    SET_HORIZONTAL     shift, and go to state 16
+    SET_HEADING        shift, and go to state 17
+    SET_SPRAY          shift, and go to state 18
+    CONNECT            shift, and go to state 19
+    SLEEP              shift, and go to state 20
+    SCAN_NEXT          shift, and go to state 21
+    PRINT_OUT          shift, and go to state 22
+
+    EXPRESSION               go to state 134
+    ARITHMETIC_EXPRESSION    go to state 52
+    ARITHMETIC_FACTOR        go to state 53
+    ARITHMETIC_COMPOSITION   go to state 54
+    LOGICAL_FACTOR           go to state 55
+    LOGICAL_COMPOSITION      go to state 56
+    LOGICAL_COMP_DUO         go to state 57
+    RELATIONAL_EXPRESSION    go to state 58
+    EQUIVALANCE_EXPRESSION   go to state 59
+    VALUE                    go to state 60
+    CONSTANT                 go to state 61
+    BOOLEAN_VAL              go to state 62
+    FUNCTION_CALL            go to state 99
+    PRIMITIVE_FUNCTION_CALL  go to state 36
 
 
 State 75
-
-   88 PRIMITIVE_FUNCTION_CALL: PRINT_OUT LP . EXPRESSION RP
-
-    LP            shift, and go to state 43
-    NOT           shift, and go to state 44
-    INTEGER       shift, and go to state 45
-    STRING        shift, and go to state 46
-    VAR_NAME      shift, and go to state 88
-    FLOAT_NUMBER  shift, and go to state 48
-    TRUE          shift, and go to state 49
-    FALSE         shift, and go to state 50
-
-    EXPRESSION              go to state 127
-    ARITHMETIC_EXPRESSION   go to state 52
-    TERM                    go to state 53
-    FACTOR                  go to state 54
-    LOGICAL_EXPRESSION      go to state 55
-    OR_EXPRESSION           go to state 56
-    AND_EXPRESSION          go to state 57
-    BOOLEAN_FACTOR          go to state 58
-    RELATIONAL_EXPRESSION   go to state 59
-    EQUIVALANCE_EXPRESSION  go to state 60
-    VALUE                   go to state 61
-    CONSTANT                go to state 62
-    BOOLEAN_VAL             go to state 63
-
-
-State 76
 
     0 $accept: PROGRAM $end .
 
     $default  accept
 
 
-State 77
+State 76
 
-   69 FUNCTION_DEFINITION: FUNCTION . TYPE VAR_NAME LP ARGUMENTS RP LB STATEMENTS RB
-   70                    | FUNCTION . TYPE VAR_NAME LP RP LB STATEMENTS RB
+   82 FUNCTION_DEFINITION: FUNCTION . TYPE VAR_NAME LP ARGUMENTS RP LB STATEMENTS RB
+   83                    | FUNCTION . TYPE VAR_NAME LP RP LB STATEMENTS RB
 
     VOID   shift, and go to state 6
     INT    shift, and go to state 7
@@ -1377,32 +1540,32 @@ State 77
     BOOL   shift, and go to state 9
     STR    shift, and go to state 10
 
-    TYPE            go to state 128
+    TYPE            go to state 135
     PRIMITIVE_TYPE  go to state 33
 
 
-State 78
+State 77
 
     3 STATEMENTS: STATEMENTS STATEMENT .
 
     $default  reduce using rule 3 (STATEMENTS)
 
 
-State 79
+State 78
 
     4 STATEMENTS: STATEMENTS FUNCTION_DEFINITION .
 
     $default  reduce using rule 4 (STATEMENTS)
 
 
-State 80
+State 79
 
    13 NON_IF_STATEMENT: DECLARATIVE_STATEMENT SEMICOLON .
 
     $default  reduce using rule 13 (NON_IF_STATEMENT)
 
 
-State 81
+State 80
 
    22 ASSIGNMENT_STATEMENT: DECLARATIVE_STATEMENT ASSIGN_OP . EXPRESSION
    23                     | DECLARATIVE_STATEMENT ASSIGN_OP . FUNCTION_CALL
@@ -1427,574 +1590,689 @@ State 81
     SCAN_NEXT          shift, and go to state 21
     PRINT_OUT          shift, and go to state 22
 
-    EXPRESSION               go to state 129
+    EXPRESSION               go to state 136
     ARITHMETIC_EXPRESSION    go to state 52
-    TERM                     go to state 53
-    FACTOR                   go to state 54
-    LOGICAL_EXPRESSION       go to state 55
-    OR_EXPRESSION            go to state 56
-    AND_EXPRESSION           go to state 57
-    BOOLEAN_FACTOR           go to state 58
-    RELATIONAL_EXPRESSION    go to state 59
-    EQUIVALANCE_EXPRESSION   go to state 60
-    VALUE                    go to state 61
-    CONSTANT                 go to state 62
-    BOOLEAN_VAL              go to state 63
-    FUNCTION_CALL            go to state 130
+    ARITHMETIC_FACTOR        go to state 53
+    ARITHMETIC_COMPOSITION   go to state 54
+    LOGICAL_FACTOR           go to state 55
+    LOGICAL_COMPOSITION      go to state 56
+    LOGICAL_COMP_DUO         go to state 57
+    RELATIONAL_EXPRESSION    go to state 58
+    EQUIVALANCE_EXPRESSION   go to state 59
+    VALUE                    go to state 60
+    CONSTANT                 go to state 61
+    BOOLEAN_VAL              go to state 62
+    FUNCTION_CALL            go to state 137
     PRIMITIVE_FUNCTION_CALL  go to state 36
 
 
-State 82
+State 81
 
    14 NON_IF_STATEMENT: ASSIGNMENT_STATEMENT SEMICOLON .
 
     $default  reduce using rule 14 (NON_IF_STATEMENT)
 
 
-State 83
+State 82
 
    17 DECLARATIVE_STATEMENT: TYPE VAR_NAME .
 
     $default  reduce using rule 17 (DECLARATIVE_STATEMENT)
 
 
-State 84
+State 83
 
    15 NON_IF_STATEMENT: FUNCTION_CALL SEMICOLON .
 
     $default  reduce using rule 15 (NON_IF_STATEMENT)
 
 
-State 85
+State 84
 
    16 NON_IF_STATEMENT: RETURN_STATEMENT SEMICOLON .
 
     $default  reduce using rule 16 (NON_IF_STATEMENT)
 
 
-State 86
+State 85
 
    12 NON_IF_STATEMENT: LB STATEMENTS RB .
 
     $default  reduce using rule 12 (NON_IF_STATEMENT)
 
 
+State 86
+
+   86 FUNCTION_CALL: VAR_NAME LP RP .
+
+    $default  reduce using rule 86 (FUNCTION_CALL)
+
+
 State 87
 
-   73 FUNCTION_CALL: VAR_NAME LP RP .
+   76 CONSTANT: INTEGER .
 
-    $default  reduce using rule 73 (FUNCTION_CALL)
+    $default  reduce using rule 76 (CONSTANT)
 
 
 State 88
 
-   59 VALUE: VAR_NAME .
+   72 VALUE: VAR_NAME .
 
-    $default  reduce using rule 59 (VALUE)
+    $default  reduce using rule 72 (VALUE)
 
 
 State 89
 
-   71 PARAMETERS: VALUE .
+   75 CONSTANT: FLOAT_NUMBER .
 
-    $default  reduce using rule 71 (PARAMETERS)
+    $default  reduce using rule 75 (CONSTANT)
 
 
 State 90
 
-   72 PARAMETERS: PARAMETERS . COMMA VALUE
-   74 FUNCTION_CALL: VAR_NAME LP PARAMETERS . RP
+   84 PARAMETERS: VALUE .
 
-    RP     shift, and go to state 131
-    COMMA  shift, and go to state 132
+    $default  reduce using rule 84 (PARAMETERS)
 
 
 State 91
 
-   20 ASSIGNMENT_STATEMENT: VAR_NAME ASSIGN_OP EXPRESSION .
-   52 EQUIVALANCE_EXPRESSION: EXPRESSION . EQ EXPRESSION
+   74 CONSTANT: BOOLEAN_VAL .
 
-    EQ  shift, and go to state 101
-
-    $default  reduce using rule 20 (ASSIGNMENT_STATEMENT)
+    $default  reduce using rule 74 (CONSTANT)
 
 
 State 92
 
-   21 ASSIGNMENT_STATEMENT: VAR_NAME ASSIGN_OP FUNCTION_CALL .
+   85 PARAMETERS: PARAMETERS . COMMA VALUE
+   87 FUNCTION_CALL: VAR_NAME LP PARAMETERS . RP
 
-    $default  reduce using rule 21 (ASSIGNMENT_STATEMENT)
+    RP     shift, and go to state 138
+    COMMA  shift, and go to state 139
 
 
 State 93
 
-   52 EQUIVALANCE_EXPRESSION: EXPRESSION . EQ EXPRESSION
+   20 ASSIGNMENT_STATEMENT: VAR_NAME ASSIGN_OP EXPRESSION .
+   65 EQUIVALANCE_EXPRESSION: EXPRESSION . EQ EXPRESSION
 
-    EQ  shift, and go to state 101
+    EQ  shift, and go to state 106
+
+    $default  reduce using rule 20 (ASSIGNMENT_STATEMENT)
 
 
 State 94
 
-    7 MATCHED: IF LP LOGICAL_EXPRESSION . RP MATCHED ELSE MATCHED
-    9 UNMATCHED: IF LP LOGICAL_EXPRESSION . RP STATEMENT
-   10          | IF LP LOGICAL_EXPRESSION . RP MATCHED ELSE UNMATCHED
-   25 EXPRESSION: LOGICAL_EXPRESSION .
+   21 ASSIGNMENT_STATEMENT: VAR_NAME ASSIGN_OP FUNCTION_CALL .
+   34 ARITHMETIC_FACTOR: FUNCTION_CALL .
+   51 LOGICAL_FACTOR: FUNCTION_CALL .
 
-    RP  shift, and go to state 133
-
-    $default  reduce using rule 25 (EXPRESSION)
+    OR         reduce using rule 51 (LOGICAL_FACTOR)
+    SEMICOLON  reduce using rule 21 (ASSIGNMENT_STATEMENT)
+    $default   reduce using rule 34 (ARITHMETIC_FACTOR)
 
 
 State 95
 
-   18 ITERATIVE_STATEMENT: WHILE LP LOGICAL_EXPRESSION . RP MATCHED
-   25 EXPRESSION: LOGICAL_EXPRESSION .
+   65 EQUIVALANCE_EXPRESSION: EXPRESSION . EQ EXPRESSION
 
-    RP  shift, and go to state 134
-
-    $default  reduce using rule 25 (EXPRESSION)
+    EQ  shift, and go to state 106
 
 
 State 96
 
-   19 ITERATIVE_STATEMENT: FOR LP NON_IF_STATEMENT . SEMICOLON LOGICAL_EXPRESSION SEMICOLON NON_IF_STATEMENT RP MATCHED
+    7 MATCHED: IF LP LOGICAL_EXPRESSION . RP MATCHED ELSE MATCHED
+    9 UNMATCHED: IF LP LOGICAL_EXPRESSION . RP STATEMENT
+   10          | IF LP LOGICAL_EXPRESSION . RP MATCHED ELSE UNMATCHED
 
-    SEMICOLON  shift, and go to state 135
+    RP  shift, and go to state 140
 
 
 State 97
 
-   24 EXPRESSION: LP EXPRESSION . RP
-   52 EQUIVALANCE_EXPRESSION: EXPRESSION . EQ EXPRESSION
+   45 LOGICAL_EXPRESSION: LOGICAL_FACTOR .
+   58 LOGICAL_COMP_DUO: LOGICAL_FACTOR . OR LOGICAL_FACTOR
 
-    RP  shift, and go to state 136
-    EQ  shift, and go to state 101
+    OR  shift, and go to state 116
+
+    OR        [reduce using rule 45 (LOGICAL_EXPRESSION)]
+    $default  reduce using rule 45 (LOGICAL_EXPRESSION)
 
 
 State 98
 
-   26 EXPRESSION: ARITHMETIC_EXPRESSION .
-   27 ARITHMETIC_EXPRESSION: ARITHMETIC_EXPRESSION . ADDITIVE_OPERATOR TERM
-   31 FACTOR: LP ARITHMETIC_EXPRESSION . RP
-   46 RELATIONAL_EXPRESSION: ARITHMETIC_EXPRESSION . RELATIONAL_OPERATOR ARITHMETIC_EXPRESSION
+   25 EXPRESSION: LOGICAL_COMPOSITION .
+   44 LOGICAL_EXPRESSION: LOGICAL_COMPOSITION .
+   53 LOGICAL_COMPOSITION: LOGICAL_COMPOSITION . OR LOGICAL_FACTOR
+   54                    | LOGICAL_COMPOSITION . OR LOGICAL_TERM
 
-    RP   shift, and go to state 137
-    ADD  shift, and go to state 102
-    SUB  shift, and go to state 103
-    LT   shift, and go to state 104
-    LE   shift, and go to state 105
-    GT   shift, and go to state 106
-    GE   shift, and go to state 107
+    OR  shift, and go to state 117
 
-    RP        [reduce using rule 26 (EXPRESSION)]
-    $default  reduce using rule 26 (EXPRESSION)
-
-    ADDITIVE_OPERATOR    go to state 108
-    RELATIONAL_OPERATOR  go to state 109
+    AND        reduce using rule 44 (LOGICAL_EXPRESSION)
+    OR         [reduce using rule 44 (LOGICAL_EXPRESSION)]
+    RP         reduce using rule 25 (EXPRESSION)
+    RP         [reduce using rule 44 (LOGICAL_EXPRESSION)]
+    SEMICOLON  reduce using rule 44 (LOGICAL_EXPRESSION)
+    EQ         reduce using rule 25 (EXPRESSION)
+    EQ         [reduce using rule 44 (LOGICAL_EXPRESSION)]
+    $default   reduce using rule 25 (EXPRESSION)
 
 
 State 99
 
-   37 LOGICAL_EXPRESSION: OR_EXPRESSION .
-   38 OR_EXPRESSION: OR_EXPRESSION . OR AND_EXPRESSION
-   43 BOOLEAN_FACTOR: LP OR_EXPRESSION . RP
+   34 ARITHMETIC_FACTOR: FUNCTION_CALL .
+   51 LOGICAL_FACTOR: FUNCTION_CALL .
 
-    OR  shift, and go to state 113
-    RP  shift, and go to state 138
-
-    RP        [reduce using rule 37 (LOGICAL_EXPRESSION)]
-    $default  reduce using rule 37 (LOGICAL_EXPRESSION)
+    AND        reduce using rule 51 (LOGICAL_FACTOR)
+    OR         reduce using rule 51 (LOGICAL_FACTOR)
+    RP         reduce using rule 34 (ARITHMETIC_FACTOR)
+    RP         [reduce using rule 51 (LOGICAL_FACTOR)]
+    SEMICOLON  reduce using rule 51 (LOGICAL_FACTOR)
+    EQ         reduce using rule 51 (LOGICAL_FACTOR)
+    $default   reduce using rule 34 (ARITHMETIC_FACTOR)
 
 
 State 100
 
-   41 AND_EXPRESSION: BOOLEAN_FACTOR .
-   42 BOOLEAN_FACTOR: NOT BOOLEAN_FACTOR .
+   18 ITERATIVE_STATEMENT: WHILE LP LOGICAL_EXPRESSION . RP MATCHED
 
-    AND        reduce using rule 41 (AND_EXPRESSION)
-    AND        [reduce using rule 42 (BOOLEAN_FACTOR)]
-    OR         reduce using rule 41 (AND_EXPRESSION)
-    OR         [reduce using rule 42 (BOOLEAN_FACTOR)]
-    RP         reduce using rule 42 (BOOLEAN_FACTOR)
-    SEMICOLON  reduce using rule 42 (BOOLEAN_FACTOR)
-    EQ         reduce using rule 41 (AND_EXPRESSION)
-    EQ         [reduce using rule 42 (BOOLEAN_FACTOR)]
-    $default   reduce using rule 41 (AND_EXPRESSION)
+    RP  shift, and go to state 141
 
 
 State 101
 
-   52 EQUIVALANCE_EXPRESSION: EXPRESSION EQ . EXPRESSION
+   19 ITERATIVE_STATEMENT: FOR LP NON_IF_STATEMENT . SEMICOLON LOGICAL_EXPRESSION SEMICOLON NON_IF_STATEMENT RP MATCHED
 
-    LP            shift, and go to state 43
-    NOT           shift, and go to state 44
-    INTEGER       shift, and go to state 45
-    STRING        shift, and go to state 46
-    VAR_NAME      shift, and go to state 88
-    FLOAT_NUMBER  shift, and go to state 48
-    TRUE          shift, and go to state 49
-    FALSE         shift, and go to state 50
-
-    EXPRESSION              go to state 139
-    ARITHMETIC_EXPRESSION   go to state 52
-    TERM                    go to state 53
-    FACTOR                  go to state 54
-    LOGICAL_EXPRESSION      go to state 55
-    OR_EXPRESSION           go to state 56
-    AND_EXPRESSION          go to state 57
-    BOOLEAN_FACTOR          go to state 58
-    RELATIONAL_EXPRESSION   go to state 59
-    EQUIVALANCE_EXPRESSION  go to state 60
-    VALUE                   go to state 61
-    CONSTANT                go to state 62
-    BOOLEAN_VAL             go to state 63
+    SEMICOLON  shift, and go to state 142
 
 
 State 102
 
-   33 ADDITIVE_OPERATOR: ADD .
+   24 EXPRESSION: LP EXPRESSION . RP
+   65 EQUIVALANCE_EXPRESSION: EXPRESSION . EQ EXPRESSION
 
-    $default  reduce using rule 33 (ADDITIVE_OPERATOR)
+    RP  shift, and go to state 143
+    EQ  shift, and go to state 106
 
 
 State 103
 
-   34 ADDITIVE_OPERATOR: SUB .
+   33 ARITHMETIC_FACTOR: LP ARITHMETIC_EXPRESSION . RP
+   59 RELATIONAL_EXPRESSION: ARITHMETIC_EXPRESSION . RELATIONAL_OPERATOR ARITHMETIC_EXPRESSION
 
-    $default  reduce using rule 34 (ADDITIVE_OPERATOR)
+    RP  shift, and go to state 144
+    LT  shift, and go to state 107
+    LE  shift, and go to state 108
+    GT  shift, and go to state 109
+    GE  shift, and go to state 110
+
+    RELATIONAL_OPERATOR  go to state 111
 
 
 State 104
 
-   48 RELATIONAL_OPERATOR: LT .
+   50 LOGICAL_FACTOR: LP LOGICAL_EXPRESSION . RP
 
-    $default  reduce using rule 48 (RELATIONAL_OPERATOR)
+    RP  shift, and go to state 145
 
 
 State 105
 
-   51 RELATIONAL_OPERATOR: LE .
+   49 LOGICAL_FACTOR: NOT LOGICAL_EXPRESSION .
 
-    $default  reduce using rule 51 (RELATIONAL_OPERATOR)
+    $default  reduce using rule 49 (LOGICAL_FACTOR)
 
 
 State 106
 
-   49 RELATIONAL_OPERATOR: GT .
+   65 EQUIVALANCE_EXPRESSION: EXPRESSION EQ . EXPRESSION
 
-    $default  reduce using rule 49 (RELATIONAL_OPERATOR)
+    LP                 shift, and go to state 43
+    NOT                shift, and go to state 44
+    INTEGER            shift, and go to state 45
+    STRING             shift, and go to state 46
+    VAR_NAME           shift, and go to state 47
+    FLOAT_NUMBER       shift, and go to state 48
+    TRUE               shift, and go to state 49
+    FALSE              shift, and go to state 50
+    GET_HEADINGS       shift, and go to state 12
+    GET_ALTITUDE       shift, and go to state 13
+    GET_TEMPERATURE    shift, and go to state 14
+    SET_VERTICALCLIMB  shift, and go to state 15
+    SET_HORIZONTAL     shift, and go to state 16
+    SET_HEADING        shift, and go to state 17
+    SET_SPRAY          shift, and go to state 18
+    CONNECT            shift, and go to state 19
+    SLEEP              shift, and go to state 20
+    SCAN_NEXT          shift, and go to state 21
+    PRINT_OUT          shift, and go to state 22
+
+    EXPRESSION               go to state 146
+    ARITHMETIC_EXPRESSION    go to state 52
+    ARITHMETIC_FACTOR        go to state 53
+    ARITHMETIC_COMPOSITION   go to state 54
+    LOGICAL_FACTOR           go to state 55
+    LOGICAL_COMPOSITION      go to state 56
+    LOGICAL_COMP_DUO         go to state 57
+    RELATIONAL_EXPRESSION    go to state 58
+    EQUIVALANCE_EXPRESSION   go to state 59
+    VALUE                    go to state 60
+    CONSTANT                 go to state 61
+    BOOLEAN_VAL              go to state 62
+    FUNCTION_CALL            go to state 99
+    PRIMITIVE_FUNCTION_CALL  go to state 36
 
 
 State 107
 
-   50 RELATIONAL_OPERATOR: GE .
+   61 RELATIONAL_OPERATOR: LT .
 
-    $default  reduce using rule 50 (RELATIONAL_OPERATOR)
+    $default  reduce using rule 61 (RELATIONAL_OPERATOR)
 
 
 State 108
 
-   27 ARITHMETIC_EXPRESSION: ARITHMETIC_EXPRESSION ADDITIVE_OPERATOR . TERM
+   64 RELATIONAL_OPERATOR: LE .
 
-    LP            shift, and go to state 118
-    INTEGER       shift, and go to state 45
-    STRING        shift, and go to state 46
-    VAR_NAME      shift, and go to state 88
-    FLOAT_NUMBER  shift, and go to state 48
-    TRUE          shift, and go to state 49
-    FALSE         shift, and go to state 50
-
-    TERM         go to state 140
-    FACTOR       go to state 54
-    VALUE        go to state 120
-    CONSTANT     go to state 62
-    BOOLEAN_VAL  go to state 63
+    $default  reduce using rule 64 (RELATIONAL_OPERATOR)
 
 
 State 109
 
-   46 RELATIONAL_EXPRESSION: ARITHMETIC_EXPRESSION RELATIONAL_OPERATOR . ARITHMETIC_EXPRESSION
+   62 RELATIONAL_OPERATOR: GT .
 
-    LP            shift, and go to state 118
-    INTEGER       shift, and go to state 45
-    STRING        shift, and go to state 46
-    VAR_NAME      shift, and go to state 88
-    FLOAT_NUMBER  shift, and go to state 48
-    TRUE          shift, and go to state 49
-    FALSE         shift, and go to state 50
-
-    ARITHMETIC_EXPRESSION  go to state 141
-    TERM                   go to state 53
-    FACTOR                 go to state 54
-    VALUE                  go to state 120
-    CONSTANT               go to state 62
-    BOOLEAN_VAL            go to state 63
+    $default  reduce using rule 62 (RELATIONAL_OPERATOR)
 
 
 State 110
 
-   35 MULTIPLICATIVE_OPERATOR: MUL .
+   63 RELATIONAL_OPERATOR: GE .
 
-    $default  reduce using rule 35 (MULTIPLICATIVE_OPERATOR)
+    $default  reduce using rule 63 (RELATIONAL_OPERATOR)
 
 
 State 111
 
-   36 MULTIPLICATIVE_OPERATOR: DIV .
+   59 RELATIONAL_EXPRESSION: ARITHMETIC_EXPRESSION RELATIONAL_OPERATOR . ARITHMETIC_EXPRESSION
 
-    $default  reduce using rule 36 (MULTIPLICATIVE_OPERATOR)
+    LP                 shift, and go to state 121
+    INTEGER            shift, and go to state 122
+    VAR_NAME           shift, and go to state 123
+    FLOAT_NUMBER       shift, and go to state 124
+    GET_HEADINGS       shift, and go to state 12
+    GET_ALTITUDE       shift, and go to state 13
+    GET_TEMPERATURE    shift, and go to state 14
+    SET_VERTICALCLIMB  shift, and go to state 15
+    SET_HORIZONTAL     shift, and go to state 16
+    SET_HEADING        shift, and go to state 17
+    SET_SPRAY          shift, and go to state 18
+    CONNECT            shift, and go to state 19
+    SLEEP              shift, and go to state 20
+    SCAN_NEXT          shift, and go to state 21
+    PRINT_OUT          shift, and go to state 22
+
+    ARITHMETIC_EXPRESSION    go to state 147
+    ARITHMETIC_FACTOR        go to state 53
+    ARITHMETIC_COMPOSITION   go to state 126
+    FUNCTION_CALL            go to state 127
+    PRIMITIVE_FUNCTION_CALL  go to state 36
 
 
 State 112
 
-   29 TERM: TERM MULTIPLICATIVE_OPERATOR . FACTOR
+   42 MULTIPLICATIVE_OPERATOR: MUL .
 
-    LP            shift, and go to state 118
-    INTEGER       shift, and go to state 45
-    STRING        shift, and go to state 46
-    VAR_NAME      shift, and go to state 88
-    FLOAT_NUMBER  shift, and go to state 48
-    TRUE          shift, and go to state 49
-    FALSE         shift, and go to state 50
-
-    FACTOR       go to state 142
-    VALUE        go to state 120
-    CONSTANT     go to state 62
-    BOOLEAN_VAL  go to state 63
+    $default  reduce using rule 42 (MULTIPLICATIVE_OPERATOR)
 
 
 State 113
 
-   38 OR_EXPRESSION: OR_EXPRESSION OR . AND_EXPRESSION
+   43 MULTIPLICATIVE_OPERATOR: DIV .
 
-    LP            shift, and go to state 43
-    NOT           shift, and go to state 44
-    INTEGER       shift, and go to state 45
-    STRING        shift, and go to state 46
-    VAR_NAME      shift, and go to state 88
-    FLOAT_NUMBER  shift, and go to state 48
-    TRUE          shift, and go to state 49
-    FALSE         shift, and go to state 50
-
-    EXPRESSION              go to state 93
-    ARITHMETIC_EXPRESSION   go to state 52
-    TERM                    go to state 53
-    FACTOR                  go to state 54
-    LOGICAL_EXPRESSION      go to state 55
-    OR_EXPRESSION           go to state 56
-    AND_EXPRESSION          go to state 143
-    BOOLEAN_FACTOR          go to state 58
-    RELATIONAL_EXPRESSION   go to state 59
-    EQUIVALANCE_EXPRESSION  go to state 60
-    VALUE                   go to state 61
-    CONSTANT                go to state 62
-    BOOLEAN_VAL             go to state 63
+    $default  reduce using rule 43 (MULTIPLICATIVE_OPERATOR)
 
 
 State 114
 
-   40 AND_EXPRESSION: AND_EXPRESSION AND . BOOLEAN_FACTOR
+   35 ARITHMETIC_COMPOSITION: ARITHMETIC_FACTOR MULTIPLICATIVE_OPERATOR . ARITHMETIC_FACTOR
 
-    LP            shift, and go to state 43
-    NOT           shift, and go to state 44
-    INTEGER       shift, and go to state 45
-    STRING        shift, and go to state 46
-    VAR_NAME      shift, and go to state 88
-    FLOAT_NUMBER  shift, and go to state 48
-    TRUE          shift, and go to state 49
-    FALSE         shift, and go to state 50
+    LP                 shift, and go to state 121
+    INTEGER            shift, and go to state 122
+    VAR_NAME           shift, and go to state 123
+    FLOAT_NUMBER       shift, and go to state 124
+    GET_HEADINGS       shift, and go to state 12
+    GET_ALTITUDE       shift, and go to state 13
+    GET_TEMPERATURE    shift, and go to state 14
+    SET_VERTICALCLIMB  shift, and go to state 15
+    SET_HORIZONTAL     shift, and go to state 16
+    SET_HEADING        shift, and go to state 17
+    SET_SPRAY          shift, and go to state 18
+    CONNECT            shift, and go to state 19
+    SLEEP              shift, and go to state 20
+    SCAN_NEXT          shift, and go to state 21
+    PRINT_OUT          shift, and go to state 22
 
-    EXPRESSION              go to state 93
-    ARITHMETIC_EXPRESSION   go to state 52
-    TERM                    go to state 53
-    FACTOR                  go to state 54
-    LOGICAL_EXPRESSION      go to state 55
-    OR_EXPRESSION           go to state 56
-    AND_EXPRESSION          go to state 57
-    BOOLEAN_FACTOR          go to state 144
-    RELATIONAL_EXPRESSION   go to state 59
-    EQUIVALANCE_EXPRESSION  go to state 60
-    VALUE                   go to state 61
-    CONSTANT                go to state 62
-    BOOLEAN_VAL             go to state 63
+    ARITHMETIC_FACTOR        go to state 148
+    FUNCTION_CALL            go to state 127
+    PRIMITIVE_FUNCTION_CALL  go to state 36
 
 
 State 115
 
-   78 PRIMITIVE_FUNCTION_CALL: GET_HEADINGS LP RP .
+   36 ARITHMETIC_COMPOSITION: ARITHMETIC_COMPOSITION MULTIPLICATIVE_OPERATOR . ARITHMETIC_FACTOR
+   37                       | ARITHMETIC_COMPOSITION MULTIPLICATIVE_OPERATOR . ARITHMETIC_TERM
 
-    $default  reduce using rule 78 (PRIMITIVE_FUNCTION_CALL)
+    LP                 shift, and go to state 121
+    INTEGER            shift, and go to state 122
+    VAR_NAME           shift, and go to state 123
+    FLOAT_NUMBER       shift, and go to state 124
+    GET_HEADINGS       shift, and go to state 12
+    GET_ALTITUDE       shift, and go to state 13
+    GET_TEMPERATURE    shift, and go to state 14
+    SET_VERTICALCLIMB  shift, and go to state 15
+    SET_HORIZONTAL     shift, and go to state 16
+    SET_HEADING        shift, and go to state 17
+    SET_SPRAY          shift, and go to state 18
+    CONNECT            shift, and go to state 19
+    SLEEP              shift, and go to state 20
+    SCAN_NEXT          shift, and go to state 21
+    PRINT_OUT          shift, and go to state 22
+
+    ARITHMETIC_FACTOR        go to state 149
+    ARITHMETIC_TERM          go to state 150
+    FUNCTION_CALL            go to state 127
+    PRIMITIVE_FUNCTION_CALL  go to state 36
 
 
 State 116
 
-   79 PRIMITIVE_FUNCTION_CALL: GET_ALTITUDE LP RP .
+   58 LOGICAL_COMP_DUO: LOGICAL_FACTOR OR . LOGICAL_FACTOR
 
-    $default  reduce using rule 79 (PRIMITIVE_FUNCTION_CALL)
+    LP                 shift, and go to state 43
+    NOT                shift, and go to state 44
+    INTEGER            shift, and go to state 45
+    STRING             shift, and go to state 46
+    VAR_NAME           shift, and go to state 47
+    FLOAT_NUMBER       shift, and go to state 48
+    TRUE               shift, and go to state 49
+    FALSE              shift, and go to state 50
+    GET_HEADINGS       shift, and go to state 12
+    GET_ALTITUDE       shift, and go to state 13
+    GET_TEMPERATURE    shift, and go to state 14
+    SET_VERTICALCLIMB  shift, and go to state 15
+    SET_HORIZONTAL     shift, and go to state 16
+    SET_HEADING        shift, and go to state 17
+    SET_SPRAY          shift, and go to state 18
+    CONNECT            shift, and go to state 19
+    SLEEP              shift, and go to state 20
+    SCAN_NEXT          shift, and go to state 21
+    PRINT_OUT          shift, and go to state 22
+
+    EXPRESSION               go to state 95
+    ARITHMETIC_EXPRESSION    go to state 52
+    ARITHMETIC_FACTOR        go to state 53
+    ARITHMETIC_COMPOSITION   go to state 54
+    LOGICAL_FACTOR           go to state 151
+    LOGICAL_COMPOSITION      go to state 56
+    LOGICAL_COMP_DUO         go to state 57
+    RELATIONAL_EXPRESSION    go to state 58
+    EQUIVALANCE_EXPRESSION   go to state 59
+    VALUE                    go to state 60
+    CONSTANT                 go to state 61
+    BOOLEAN_VAL              go to state 62
+    FUNCTION_CALL            go to state 99
+    PRIMITIVE_FUNCTION_CALL  go to state 36
 
 
 State 117
 
-   80 PRIMITIVE_FUNCTION_CALL: GET_TEMPERATURE LP RP .
+   53 LOGICAL_COMPOSITION: LOGICAL_COMPOSITION OR . LOGICAL_FACTOR
+   54                    | LOGICAL_COMPOSITION OR . LOGICAL_TERM
 
-    $default  reduce using rule 80 (PRIMITIVE_FUNCTION_CALL)
+    LP                 shift, and go to state 43
+    NOT                shift, and go to state 44
+    INTEGER            shift, and go to state 45
+    STRING             shift, and go to state 46
+    VAR_NAME           shift, and go to state 47
+    FLOAT_NUMBER       shift, and go to state 48
+    TRUE               shift, and go to state 49
+    FALSE              shift, and go to state 50
+    GET_HEADINGS       shift, and go to state 12
+    GET_ALTITUDE       shift, and go to state 13
+    GET_TEMPERATURE    shift, and go to state 14
+    SET_VERTICALCLIMB  shift, and go to state 15
+    SET_HORIZONTAL     shift, and go to state 16
+    SET_HEADING        shift, and go to state 17
+    SET_SPRAY          shift, and go to state 18
+    CONNECT            shift, and go to state 19
+    SLEEP              shift, and go to state 20
+    SCAN_NEXT          shift, and go to state 21
+    PRINT_OUT          shift, and go to state 22
+
+    EXPRESSION               go to state 95
+    ARITHMETIC_EXPRESSION    go to state 52
+    ARITHMETIC_FACTOR        go to state 53
+    ARITHMETIC_COMPOSITION   go to state 54
+    LOGICAL_FACTOR           go to state 152
+    LOGICAL_COMPOSITION      go to state 56
+    LOGICAL_TERM             go to state 153
+    LOGICAL_TERM_DUO         go to state 154
+    LOGICAL_COMP_DUO         go to state 57
+    RELATIONAL_EXPRESSION    go to state 58
+    EQUIVALANCE_EXPRESSION   go to state 59
+    VALUE                    go to state 60
+    CONSTANT                 go to state 61
+    BOOLEAN_VAL              go to state 62
+    FUNCTION_CALL            go to state 99
+    PRIMITIVE_FUNCTION_CALL  go to state 36
 
 
 State 118
 
-   31 FACTOR: LP . ARITHMETIC_EXPRESSION RP
+   91 PRIMITIVE_FUNCTION_CALL: GET_HEADINGS LP RP .
 
-    LP            shift, and go to state 118
-    INTEGER       shift, and go to state 45
-    STRING        shift, and go to state 46
-    VAR_NAME      shift, and go to state 88
-    FLOAT_NUMBER  shift, and go to state 48
-    TRUE          shift, and go to state 49
-    FALSE         shift, and go to state 50
-
-    ARITHMETIC_EXPRESSION  go to state 145
-    TERM                   go to state 53
-    FACTOR                 go to state 54
-    VALUE                  go to state 120
-    CONSTANT               go to state 62
-    BOOLEAN_VAL            go to state 63
+    $default  reduce using rule 91 (PRIMITIVE_FUNCTION_CALL)
 
 
 State 119
 
-   27 ARITHMETIC_EXPRESSION: ARITHMETIC_EXPRESSION . ADDITIVE_OPERATOR TERM
-   81 PRIMITIVE_FUNCTION_CALL: SET_VERTICALCLIMB LP ARITHMETIC_EXPRESSION . RP
+   92 PRIMITIVE_FUNCTION_CALL: GET_ALTITUDE LP RP .
 
-    RP   shift, and go to state 146
-    ADD  shift, and go to state 102
-    SUB  shift, and go to state 103
-
-    ADDITIVE_OPERATOR  go to state 108
+    $default  reduce using rule 92 (PRIMITIVE_FUNCTION_CALL)
 
 
 State 120
 
-   32 FACTOR: VALUE .
+   93 PRIMITIVE_FUNCTION_CALL: GET_TEMPERATURE LP RP .
 
-    $default  reduce using rule 32 (FACTOR)
+    $default  reduce using rule 93 (PRIMITIVE_FUNCTION_CALL)
 
 
 State 121
 
-   27 ARITHMETIC_EXPRESSION: ARITHMETIC_EXPRESSION . ADDITIVE_OPERATOR TERM
-   82 PRIMITIVE_FUNCTION_CALL: SET_HORIZONTAL LP ARITHMETIC_EXPRESSION . RP
+   33 ARITHMETIC_FACTOR: LP . ARITHMETIC_EXPRESSION RP
 
-    RP   shift, and go to state 147
-    ADD  shift, and go to state 102
-    SUB  shift, and go to state 103
+    LP                 shift, and go to state 121
+    INTEGER            shift, and go to state 122
+    VAR_NAME           shift, and go to state 123
+    FLOAT_NUMBER       shift, and go to state 124
+    GET_HEADINGS       shift, and go to state 12
+    GET_ALTITUDE       shift, and go to state 13
+    GET_TEMPERATURE    shift, and go to state 14
+    SET_VERTICALCLIMB  shift, and go to state 15
+    SET_HORIZONTAL     shift, and go to state 16
+    SET_HEADING        shift, and go to state 17
+    SET_SPRAY          shift, and go to state 18
+    CONNECT            shift, and go to state 19
+    SLEEP              shift, and go to state 20
+    SCAN_NEXT          shift, and go to state 21
+    PRINT_OUT          shift, and go to state 22
 
-    ADDITIVE_OPERATOR  go to state 108
+    ARITHMETIC_EXPRESSION    go to state 155
+    ARITHMETIC_FACTOR        go to state 53
+    ARITHMETIC_COMPOSITION   go to state 126
+    FUNCTION_CALL            go to state 127
+    PRIMITIVE_FUNCTION_CALL  go to state 36
 
 
 State 122
 
-   25 EXPRESSION: LOGICAL_EXPRESSION .
-   83 PRIMITIVE_FUNCTION_CALL: SET_HEADING LP LOGICAL_EXPRESSION . RP
+   31 ARITHMETIC_FACTOR: INTEGER .
 
-    RP  shift, and go to state 148
-
-    $default  reduce using rule 25 (EXPRESSION)
+    $default  reduce using rule 31 (ARITHMETIC_FACTOR)
 
 
 State 123
 
-   25 EXPRESSION: LOGICAL_EXPRESSION .
-   84 PRIMITIVE_FUNCTION_CALL: SET_SPRAY LP LOGICAL_EXPRESSION . RP
+   30 ARITHMETIC_FACTOR: VAR_NAME .
+   86 FUNCTION_CALL: VAR_NAME . LP RP
+   87              | VAR_NAME . LP PARAMETERS RP
 
-    RP  shift, and go to state 149
+    LP  shift, and go to state 38
 
-    $default  reduce using rule 25 (EXPRESSION)
+    $default  reduce using rule 30 (ARITHMETIC_FACTOR)
 
 
 State 124
 
-   85 PRIMITIVE_FUNCTION_CALL: CONNECT LP STRING . COMMA STRING RP
+   32 ARITHMETIC_FACTOR: FLOAT_NUMBER .
 
-    COMMA  shift, and go to state 150
+    $default  reduce using rule 32 (ARITHMETIC_FACTOR)
 
 
 State 125
 
-   27 ARITHMETIC_EXPRESSION: ARITHMETIC_EXPRESSION . ADDITIVE_OPERATOR TERM
-   86 PRIMITIVE_FUNCTION_CALL: SLEEP LP ARITHMETIC_EXPRESSION . RP
+   94 PRIMITIVE_FUNCTION_CALL: SET_VERTICALCLIMB LP ARITHMETIC_EXPRESSION . RP
 
-    RP   shift, and go to state 151
-    ADD  shift, and go to state 102
-    SUB  shift, and go to state 103
-
-    ADDITIVE_OPERATOR  go to state 108
+    RP  shift, and go to state 156
 
 
 State 126
 
-   87 PRIMITIVE_FUNCTION_CALL: SCAN_NEXT LP RP .
+   28 ARITHMETIC_EXPRESSION: ARITHMETIC_COMPOSITION .
+   36 ARITHMETIC_COMPOSITION: ARITHMETIC_COMPOSITION . MULTIPLICATIVE_OPERATOR ARITHMETIC_FACTOR
+   37                       | ARITHMETIC_COMPOSITION . MULTIPLICATIVE_OPERATOR ARITHMETIC_TERM
 
-    $default  reduce using rule 87 (PRIMITIVE_FUNCTION_CALL)
+    MUL  shift, and go to state 112
+    DIV  shift, and go to state 113
+
+    $default  reduce using rule 28 (ARITHMETIC_EXPRESSION)
+
+    MULTIPLICATIVE_OPERATOR  go to state 115
 
 
 State 127
 
-   52 EQUIVALANCE_EXPRESSION: EXPRESSION . EQ EXPRESSION
-   88 PRIMITIVE_FUNCTION_CALL: PRINT_OUT LP EXPRESSION . RP
+   34 ARITHMETIC_FACTOR: FUNCTION_CALL .
 
-    RP  shift, and go to state 152
-    EQ  shift, and go to state 101
+    $default  reduce using rule 34 (ARITHMETIC_FACTOR)
 
 
 State 128
 
-   69 FUNCTION_DEFINITION: FUNCTION TYPE . VAR_NAME LP ARGUMENTS RP LB STATEMENTS RB
-   70                    | FUNCTION TYPE . VAR_NAME LP RP LB STATEMENTS RB
+   95 PRIMITIVE_FUNCTION_CALL: SET_HORIZONTAL LP ARITHMETIC_EXPRESSION . RP
 
-    VAR_NAME  shift, and go to state 153
+    RP  shift, and go to state 157
 
 
 State 129
 
-   22 ASSIGNMENT_STATEMENT: DECLARATIVE_STATEMENT ASSIGN_OP EXPRESSION .
-   52 EQUIVALANCE_EXPRESSION: EXPRESSION . EQ EXPRESSION
+   96 PRIMITIVE_FUNCTION_CALL: SET_HEADING LP LOGICAL_EXPRESSION . RP
 
-    EQ  shift, and go to state 101
-
-    $default  reduce using rule 22 (ASSIGNMENT_STATEMENT)
+    RP  shift, and go to state 158
 
 
 State 130
 
-   23 ASSIGNMENT_STATEMENT: DECLARATIVE_STATEMENT ASSIGN_OP FUNCTION_CALL .
+   97 PRIMITIVE_FUNCTION_CALL: SET_SPRAY LP LOGICAL_EXPRESSION . RP
 
-    $default  reduce using rule 23 (ASSIGNMENT_STATEMENT)
+    RP  shift, and go to state 159
 
 
 State 131
 
-   74 FUNCTION_CALL: VAR_NAME LP PARAMETERS RP .
+   98 PRIMITIVE_FUNCTION_CALL: CONNECT LP STRING . COMMA STRING RP
 
-    $default  reduce using rule 74 (FUNCTION_CALL)
+    COMMA  shift, and go to state 160
 
 
 State 132
 
-   72 PARAMETERS: PARAMETERS COMMA . VALUE
+   99 PRIMITIVE_FUNCTION_CALL: SLEEP LP ARITHMETIC_EXPRESSION . RP
 
-    INTEGER       shift, and go to state 45
-    STRING        shift, and go to state 46
-    VAR_NAME      shift, and go to state 88
-    FLOAT_NUMBER  shift, and go to state 48
-    TRUE          shift, and go to state 49
-    FALSE         shift, and go to state 50
-
-    VALUE        go to state 154
-    CONSTANT     go to state 62
-    BOOLEAN_VAL  go to state 63
+    RP  shift, and go to state 161
 
 
 State 133
+
+  100 PRIMITIVE_FUNCTION_CALL: SCAN_NEXT LP RP .
+
+    $default  reduce using rule 100 (PRIMITIVE_FUNCTION_CALL)
+
+
+State 134
+
+   65 EQUIVALANCE_EXPRESSION: EXPRESSION . EQ EXPRESSION
+  101 PRIMITIVE_FUNCTION_CALL: PRINT_OUT LP EXPRESSION . RP
+
+    RP  shift, and go to state 162
+    EQ  shift, and go to state 106
+
+
+State 135
+
+   82 FUNCTION_DEFINITION: FUNCTION TYPE . VAR_NAME LP ARGUMENTS RP LB STATEMENTS RB
+   83                    | FUNCTION TYPE . VAR_NAME LP RP LB STATEMENTS RB
+
+    VAR_NAME  shift, and go to state 163
+
+
+State 136
+
+   22 ASSIGNMENT_STATEMENT: DECLARATIVE_STATEMENT ASSIGN_OP EXPRESSION .
+   65 EQUIVALANCE_EXPRESSION: EXPRESSION . EQ EXPRESSION
+
+    EQ  shift, and go to state 106
+
+    $default  reduce using rule 22 (ASSIGNMENT_STATEMENT)
+
+
+State 137
+
+   23 ASSIGNMENT_STATEMENT: DECLARATIVE_STATEMENT ASSIGN_OP FUNCTION_CALL .
+   34 ARITHMETIC_FACTOR: FUNCTION_CALL .
+   51 LOGICAL_FACTOR: FUNCTION_CALL .
+
+    OR         reduce using rule 51 (LOGICAL_FACTOR)
+    SEMICOLON  reduce using rule 23 (ASSIGNMENT_STATEMENT)
+    $default   reduce using rule 34 (ARITHMETIC_FACTOR)
+
+
+State 138
+
+   87 FUNCTION_CALL: VAR_NAME LP PARAMETERS RP .
+
+    $default  reduce using rule 87 (FUNCTION_CALL)
+
+
+State 139
+
+   85 PARAMETERS: PARAMETERS COMMA . VALUE
+
+    INTEGER       shift, and go to state 87
+    STRING        shift, and go to state 46
+    VAR_NAME      shift, and go to state 88
+    FLOAT_NUMBER  shift, and go to state 89
+    TRUE          shift, and go to state 49
+    FALSE         shift, and go to state 50
+
+    VALUE        go to state 164
+    CONSTANT     go to state 61
+    BOOLEAN_VAL  go to state 91
+
+
+State 140
 
     7 MATCHED: IF LP LOGICAL_EXPRESSION RP . MATCHED ELSE MATCHED
     9 UNMATCHED: IF LP LOGICAL_EXPRESSION RP . STATEMENT
@@ -2023,8 +2301,8 @@ State 133
     SCAN_NEXT          shift, and go to state 21
     PRINT_OUT          shift, and go to state 22
 
-    STATEMENT                go to state 155
-    MATCHED                  go to state 156
+    STATEMENT                go to state 165
+    MATCHED                  go to state 166
     UNMATCHED                go to state 27
     NON_IF_STATEMENT         go to state 28
     DECLARATIVE_STATEMENT    go to state 29
@@ -2037,13 +2315,13 @@ State 133
     PRIMITIVE_FUNCTION_CALL  go to state 36
 
 
-State 134
+State 141
 
    18 ITERATIVE_STATEMENT: WHILE LP LOGICAL_EXPRESSION RP . MATCHED
 
     LB                 shift, and go to state 1
     VAR_NAME           shift, and go to state 2
-    IF                 shift, and go to state 157
+    IF                 shift, and go to state 167
     WHILE              shift, and go to state 4
     FOR                shift, and go to state 5
     VOID               shift, and go to state 6
@@ -2064,7 +2342,7 @@ State 134
     SCAN_NEXT          shift, and go to state 21
     PRINT_OUT          shift, and go to state 22
 
-    MATCHED                  go to state 158
+    MATCHED                  go to state 168
     NON_IF_STATEMENT         go to state 28
     DECLARATIVE_STATEMENT    go to state 29
     ITERATIVE_STATEMENT      go to state 30
@@ -2076,272 +2354,441 @@ State 134
     PRIMITIVE_FUNCTION_CALL  go to state 36
 
 
-State 135
+State 142
 
    19 ITERATIVE_STATEMENT: FOR LP NON_IF_STATEMENT SEMICOLON . LOGICAL_EXPRESSION SEMICOLON NON_IF_STATEMENT RP MATCHED
 
-    LP            shift, and go to state 43
-    NOT           shift, and go to state 44
-    INTEGER       shift, and go to state 45
-    STRING        shift, and go to state 46
-    VAR_NAME      shift, and go to state 88
-    FLOAT_NUMBER  shift, and go to state 48
-    TRUE          shift, and go to state 49
-    FALSE         shift, and go to state 50
+    LP                 shift, and go to state 43
+    NOT                shift, and go to state 44
+    INTEGER            shift, and go to state 45
+    STRING             shift, and go to state 46
+    VAR_NAME           shift, and go to state 47
+    FLOAT_NUMBER       shift, and go to state 48
+    TRUE               shift, and go to state 49
+    FALSE              shift, and go to state 50
+    GET_HEADINGS       shift, and go to state 12
+    GET_ALTITUDE       shift, and go to state 13
+    GET_TEMPERATURE    shift, and go to state 14
+    SET_VERTICALCLIMB  shift, and go to state 15
+    SET_HORIZONTAL     shift, and go to state 16
+    SET_HEADING        shift, and go to state 17
+    SET_SPRAY          shift, and go to state 18
+    CONNECT            shift, and go to state 19
+    SLEEP              shift, and go to state 20
+    SCAN_NEXT          shift, and go to state 21
+    PRINT_OUT          shift, and go to state 22
 
-    EXPRESSION              go to state 93
-    ARITHMETIC_EXPRESSION   go to state 52
-    TERM                    go to state 53
-    FACTOR                  go to state 54
-    LOGICAL_EXPRESSION      go to state 159
-    OR_EXPRESSION           go to state 56
-    AND_EXPRESSION          go to state 57
-    BOOLEAN_FACTOR          go to state 58
-    RELATIONAL_EXPRESSION   go to state 59
-    EQUIVALANCE_EXPRESSION  go to state 60
-    VALUE                   go to state 61
-    CONSTANT                go to state 62
-    BOOLEAN_VAL             go to state 63
+    EXPRESSION               go to state 95
+    ARITHMETIC_EXPRESSION    go to state 52
+    ARITHMETIC_FACTOR        go to state 53
+    ARITHMETIC_COMPOSITION   go to state 54
+    LOGICAL_EXPRESSION       go to state 169
+    LOGICAL_FACTOR           go to state 97
+    LOGICAL_COMPOSITION      go to state 98
+    LOGICAL_COMP_DUO         go to state 57
+    RELATIONAL_EXPRESSION    go to state 58
+    EQUIVALANCE_EXPRESSION   go to state 59
+    VALUE                    go to state 60
+    CONSTANT                 go to state 61
+    BOOLEAN_VAL              go to state 62
+    FUNCTION_CALL            go to state 99
+    PRIMITIVE_FUNCTION_CALL  go to state 36
 
 
-State 136
+State 143
 
    24 EXPRESSION: LP EXPRESSION RP .
 
     $default  reduce using rule 24 (EXPRESSION)
 
 
-State 137
-
-   31 FACTOR: LP ARITHMETIC_EXPRESSION RP .
-
-    $default  reduce using rule 31 (FACTOR)
-
-
-State 138
-
-   43 BOOLEAN_FACTOR: LP OR_EXPRESSION RP .
-
-    $default  reduce using rule 43 (BOOLEAN_FACTOR)
-
-
-State 139
-
-   52 EQUIVALANCE_EXPRESSION: EXPRESSION . EQ EXPRESSION
-   52                       | EXPRESSION EQ EXPRESSION .
-
-    EQ  shift, and go to state 101
-
-    EQ        [reduce using rule 52 (EQUIVALANCE_EXPRESSION)]
-    $default  reduce using rule 52 (EQUIVALANCE_EXPRESSION)
-
-
-State 140
-
-   27 ARITHMETIC_EXPRESSION: ARITHMETIC_EXPRESSION ADDITIVE_OPERATOR TERM .
-   29 TERM: TERM . MULTIPLICATIVE_OPERATOR FACTOR
-
-    MUL  shift, and go to state 110
-    DIV  shift, and go to state 111
-
-    $default  reduce using rule 27 (ARITHMETIC_EXPRESSION)
-
-    MULTIPLICATIVE_OPERATOR  go to state 112
-
-
-State 141
-
-   27 ARITHMETIC_EXPRESSION: ARITHMETIC_EXPRESSION . ADDITIVE_OPERATOR TERM
-   46 RELATIONAL_EXPRESSION: ARITHMETIC_EXPRESSION RELATIONAL_OPERATOR ARITHMETIC_EXPRESSION .
-
-    ADD  shift, and go to state 102
-    SUB  shift, and go to state 103
-
-    $default  reduce using rule 46 (RELATIONAL_EXPRESSION)
-
-    ADDITIVE_OPERATOR  go to state 108
-
-
-State 142
-
-   29 TERM: TERM MULTIPLICATIVE_OPERATOR FACTOR .
-
-    $default  reduce using rule 29 (TERM)
-
-
-State 143
-
-   38 OR_EXPRESSION: OR_EXPRESSION OR AND_EXPRESSION .
-   39              | AND_EXPRESSION .
-   40 AND_EXPRESSION: AND_EXPRESSION . AND BOOLEAN_FACTOR
-
-    AND  shift, and go to state 114
-
-    AND       [reduce using rule 38 (OR_EXPRESSION)]
-    OR        reduce using rule 38 (OR_EXPRESSION)
-    OR        [reduce using rule 39 (OR_EXPRESSION)]
-    EQ        reduce using rule 38 (OR_EXPRESSION)
-    EQ        [reduce using rule 39 (OR_EXPRESSION)]
-    $default  reduce using rule 38 (OR_EXPRESSION)
-
-
 State 144
 
-   40 AND_EXPRESSION: AND_EXPRESSION AND BOOLEAN_FACTOR .
-   41               | BOOLEAN_FACTOR .
+   33 ARITHMETIC_FACTOR: LP ARITHMETIC_EXPRESSION RP .
 
-    AND       reduce using rule 40 (AND_EXPRESSION)
-    AND       [reduce using rule 41 (AND_EXPRESSION)]
-    OR        reduce using rule 40 (AND_EXPRESSION)
-    OR        [reduce using rule 41 (AND_EXPRESSION)]
-    EQ        reduce using rule 40 (AND_EXPRESSION)
-    EQ        [reduce using rule 41 (AND_EXPRESSION)]
-    $default  reduce using rule 40 (AND_EXPRESSION)
+    $default  reduce using rule 33 (ARITHMETIC_FACTOR)
 
 
 State 145
 
-   27 ARITHMETIC_EXPRESSION: ARITHMETIC_EXPRESSION . ADDITIVE_OPERATOR TERM
-   31 FACTOR: LP ARITHMETIC_EXPRESSION . RP
+   50 LOGICAL_FACTOR: LP LOGICAL_EXPRESSION RP .
 
-    RP   shift, and go to state 137
-    ADD  shift, and go to state 102
-    SUB  shift, and go to state 103
-
-    ADDITIVE_OPERATOR  go to state 108
+    $default  reduce using rule 50 (LOGICAL_FACTOR)
 
 
 State 146
 
-   81 PRIMITIVE_FUNCTION_CALL: SET_VERTICALCLIMB LP ARITHMETIC_EXPRESSION RP .
+   65 EQUIVALANCE_EXPRESSION: EXPRESSION . EQ EXPRESSION
+   65                       | EXPRESSION EQ EXPRESSION .
 
-    $default  reduce using rule 81 (PRIMITIVE_FUNCTION_CALL)
+    EQ  shift, and go to state 106
+
+    EQ        [reduce using rule 65 (EQUIVALANCE_EXPRESSION)]
+    $default  reduce using rule 65 (EQUIVALANCE_EXPRESSION)
 
 
 State 147
 
-   82 PRIMITIVE_FUNCTION_CALL: SET_HORIZONTAL LP ARITHMETIC_EXPRESSION RP .
+   59 RELATIONAL_EXPRESSION: ARITHMETIC_EXPRESSION RELATIONAL_OPERATOR ARITHMETIC_EXPRESSION .
 
-    $default  reduce using rule 82 (PRIMITIVE_FUNCTION_CALL)
+    $default  reduce using rule 59 (RELATIONAL_EXPRESSION)
 
 
 State 148
 
-   83 PRIMITIVE_FUNCTION_CALL: SET_HEADING LP LOGICAL_EXPRESSION RP .
+   35 ARITHMETIC_COMPOSITION: ARITHMETIC_FACTOR MULTIPLICATIVE_OPERATOR ARITHMETIC_FACTOR .
 
-    $default  reduce using rule 83 (PRIMITIVE_FUNCTION_CALL)
+    $default  reduce using rule 35 (ARITHMETIC_COMPOSITION)
 
 
 State 149
 
-   84 PRIMITIVE_FUNCTION_CALL: SET_SPRAY LP LOGICAL_EXPRESSION RP .
+   36 ARITHMETIC_COMPOSITION: ARITHMETIC_COMPOSITION MULTIPLICATIVE_OPERATOR ARITHMETIC_FACTOR .
+   39 ARITHMETIC_TERM: ARITHMETIC_FACTOR . ADDITIVE_OPERATOR ARITHMETIC_FACTOR
 
-    $default  reduce using rule 84 (PRIMITIVE_FUNCTION_CALL)
+    ADD  shift, and go to state 170
+    SUB  shift, and go to state 171
+
+    $default  reduce using rule 36 (ARITHMETIC_COMPOSITION)
+
+    ADDITIVE_OPERATOR  go to state 172
 
 
 State 150
 
-   85 PRIMITIVE_FUNCTION_CALL: CONNECT LP STRING COMMA . STRING RP
+   37 ARITHMETIC_COMPOSITION: ARITHMETIC_COMPOSITION MULTIPLICATIVE_OPERATOR ARITHMETIC_TERM .
+   38 ARITHMETIC_TERM: ARITHMETIC_TERM . ADDITIVE_OPERATOR ARITHMETIC_FACTOR
 
-    STRING  shift, and go to state 160
+    ADD  shift, and go to state 170
+    SUB  shift, and go to state 171
+
+    $default  reduce using rule 37 (ARITHMETIC_COMPOSITION)
+
+    ADDITIVE_OPERATOR  go to state 173
 
 
 State 151
 
-   86 PRIMITIVE_FUNCTION_CALL: SLEEP LP ARITHMETIC_EXPRESSION RP .
+   58 LOGICAL_COMP_DUO: LOGICAL_FACTOR . OR LOGICAL_FACTOR
+   58                 | LOGICAL_FACTOR OR LOGICAL_FACTOR .
 
-    $default  reduce using rule 86 (PRIMITIVE_FUNCTION_CALL)
+    OR  shift, and go to state 116
+
+    OR        [reduce using rule 58 (LOGICAL_COMP_DUO)]
+    $default  reduce using rule 58 (LOGICAL_COMP_DUO)
 
 
 State 152
 
-   88 PRIMITIVE_FUNCTION_CALL: PRINT_OUT LP EXPRESSION RP .
+   53 LOGICAL_COMPOSITION: LOGICAL_COMPOSITION OR LOGICAL_FACTOR .
+   57 LOGICAL_TERM_DUO: LOGICAL_FACTOR . AND LOGICAL_FACTOR
+   58 LOGICAL_COMP_DUO: LOGICAL_FACTOR . OR LOGICAL_FACTOR
 
-    $default  reduce using rule 88 (PRIMITIVE_FUNCTION_CALL)
+    AND  shift, and go to state 174
+    OR   shift, and go to state 116
+
+    AND       [reduce using rule 53 (LOGICAL_COMPOSITION)]
+    OR        [reduce using rule 53 (LOGICAL_COMPOSITION)]
+    $default  reduce using rule 53 (LOGICAL_COMPOSITION)
 
 
 State 153
 
-   69 FUNCTION_DEFINITION: FUNCTION TYPE VAR_NAME . LP ARGUMENTS RP LB STATEMENTS RB
-   70                    | FUNCTION TYPE VAR_NAME . LP RP LB STATEMENTS RB
+   54 LOGICAL_COMPOSITION: LOGICAL_COMPOSITION OR LOGICAL_TERM .
+   56 LOGICAL_TERM: LOGICAL_TERM . AND LOGICAL_FACTOR
 
-    LP  shift, and go to state 161
+    AND  shift, and go to state 175
+
+    AND       [reduce using rule 54 (LOGICAL_COMPOSITION)]
+    $default  reduce using rule 54 (LOGICAL_COMPOSITION)
 
 
 State 154
 
-   72 PARAMETERS: PARAMETERS COMMA VALUE .
+   55 LOGICAL_TERM: LOGICAL_TERM_DUO .
 
-    $default  reduce using rule 72 (PARAMETERS)
+    $default  reduce using rule 55 (LOGICAL_TERM)
 
 
 State 155
+
+   33 ARITHMETIC_FACTOR: LP ARITHMETIC_EXPRESSION . RP
+
+    RP  shift, and go to state 144
+
+
+State 156
+
+   94 PRIMITIVE_FUNCTION_CALL: SET_VERTICALCLIMB LP ARITHMETIC_EXPRESSION RP .
+
+    $default  reduce using rule 94 (PRIMITIVE_FUNCTION_CALL)
+
+
+State 157
+
+   95 PRIMITIVE_FUNCTION_CALL: SET_HORIZONTAL LP ARITHMETIC_EXPRESSION RP .
+
+    $default  reduce using rule 95 (PRIMITIVE_FUNCTION_CALL)
+
+
+State 158
+
+   96 PRIMITIVE_FUNCTION_CALL: SET_HEADING LP LOGICAL_EXPRESSION RP .
+
+    $default  reduce using rule 96 (PRIMITIVE_FUNCTION_CALL)
+
+
+State 159
+
+   97 PRIMITIVE_FUNCTION_CALL: SET_SPRAY LP LOGICAL_EXPRESSION RP .
+
+    $default  reduce using rule 97 (PRIMITIVE_FUNCTION_CALL)
+
+
+State 160
+
+   98 PRIMITIVE_FUNCTION_CALL: CONNECT LP STRING COMMA . STRING RP
+
+    STRING  shift, and go to state 176
+
+
+State 161
+
+   99 PRIMITIVE_FUNCTION_CALL: SLEEP LP ARITHMETIC_EXPRESSION RP .
+
+    $default  reduce using rule 99 (PRIMITIVE_FUNCTION_CALL)
+
+
+State 162
+
+  101 PRIMITIVE_FUNCTION_CALL: PRINT_OUT LP EXPRESSION RP .
+
+    $default  reduce using rule 101 (PRIMITIVE_FUNCTION_CALL)
+
+
+State 163
+
+   82 FUNCTION_DEFINITION: FUNCTION TYPE VAR_NAME . LP ARGUMENTS RP LB STATEMENTS RB
+   83                    | FUNCTION TYPE VAR_NAME . LP RP LB STATEMENTS RB
+
+    LP  shift, and go to state 177
+
+
+State 164
+
+   85 PARAMETERS: PARAMETERS COMMA VALUE .
+
+    $default  reduce using rule 85 (PARAMETERS)
+
+
+State 165
 
     9 UNMATCHED: IF LP LOGICAL_EXPRESSION RP STATEMENT .
 
     $default  reduce using rule 9 (UNMATCHED)
 
 
-State 156
+State 166
 
     5 STATEMENT: MATCHED .
     7 MATCHED: IF LP LOGICAL_EXPRESSION RP MATCHED . ELSE MATCHED
    10 UNMATCHED: IF LP LOGICAL_EXPRESSION RP MATCHED . ELSE UNMATCHED
 
-    ELSE  shift, and go to state 162
+    ELSE  shift, and go to state 178
 
     $default  reduce using rule 5 (STATEMENT)
 
 
-State 157
+State 167
 
     7 MATCHED: IF . LP LOGICAL_EXPRESSION RP MATCHED ELSE MATCHED
 
-    LP  shift, and go to state 163
+    LP  shift, and go to state 179
 
 
-State 158
+State 168
 
    18 ITERATIVE_STATEMENT: WHILE LP LOGICAL_EXPRESSION RP MATCHED .
 
     $default  reduce using rule 18 (ITERATIVE_STATEMENT)
 
 
-State 159
+State 169
 
    19 ITERATIVE_STATEMENT: FOR LP NON_IF_STATEMENT SEMICOLON LOGICAL_EXPRESSION . SEMICOLON NON_IF_STATEMENT RP MATCHED
-   25 EXPRESSION: LOGICAL_EXPRESSION .
 
-    SEMICOLON  shift, and go to state 164
-
-    $default  reduce using rule 25 (EXPRESSION)
+    SEMICOLON  shift, and go to state 180
 
 
-State 160
+State 170
 
-   85 PRIMITIVE_FUNCTION_CALL: CONNECT LP STRING COMMA STRING . RP
+   40 ADDITIVE_OPERATOR: ADD .
 
-    RP  shift, and go to state 165
+    $default  reduce using rule 40 (ADDITIVE_OPERATOR)
 
 
-State 161
+State 171
 
-   69 FUNCTION_DEFINITION: FUNCTION TYPE VAR_NAME LP . ARGUMENTS RP LB STATEMENTS RB
-   70                    | FUNCTION TYPE VAR_NAME LP . RP LB STATEMENTS RB
+   41 ADDITIVE_OPERATOR: SUB .
 
-    RP     shift, and go to state 166
+    $default  reduce using rule 41 (ADDITIVE_OPERATOR)
+
+
+State 172
+
+   39 ARITHMETIC_TERM: ARITHMETIC_FACTOR ADDITIVE_OPERATOR . ARITHMETIC_FACTOR
+
+    LP                 shift, and go to state 121
+    INTEGER            shift, and go to state 122
+    VAR_NAME           shift, and go to state 123
+    FLOAT_NUMBER       shift, and go to state 124
+    GET_HEADINGS       shift, and go to state 12
+    GET_ALTITUDE       shift, and go to state 13
+    GET_TEMPERATURE    shift, and go to state 14
+    SET_VERTICALCLIMB  shift, and go to state 15
+    SET_HORIZONTAL     shift, and go to state 16
+    SET_HEADING        shift, and go to state 17
+    SET_SPRAY          shift, and go to state 18
+    CONNECT            shift, and go to state 19
+    SLEEP              shift, and go to state 20
+    SCAN_NEXT          shift, and go to state 21
+    PRINT_OUT          shift, and go to state 22
+
+    ARITHMETIC_FACTOR        go to state 181
+    FUNCTION_CALL            go to state 127
+    PRIMITIVE_FUNCTION_CALL  go to state 36
+
+
+State 173
+
+   38 ARITHMETIC_TERM: ARITHMETIC_TERM ADDITIVE_OPERATOR . ARITHMETIC_FACTOR
+
+    LP                 shift, and go to state 121
+    INTEGER            shift, and go to state 122
+    VAR_NAME           shift, and go to state 123
+    FLOAT_NUMBER       shift, and go to state 124
+    GET_HEADINGS       shift, and go to state 12
+    GET_ALTITUDE       shift, and go to state 13
+    GET_TEMPERATURE    shift, and go to state 14
+    SET_VERTICALCLIMB  shift, and go to state 15
+    SET_HORIZONTAL     shift, and go to state 16
+    SET_HEADING        shift, and go to state 17
+    SET_SPRAY          shift, and go to state 18
+    CONNECT            shift, and go to state 19
+    SLEEP              shift, and go to state 20
+    SCAN_NEXT          shift, and go to state 21
+    PRINT_OUT          shift, and go to state 22
+
+    ARITHMETIC_FACTOR        go to state 182
+    FUNCTION_CALL            go to state 127
+    PRIMITIVE_FUNCTION_CALL  go to state 36
+
+
+State 174
+
+   57 LOGICAL_TERM_DUO: LOGICAL_FACTOR AND . LOGICAL_FACTOR
+
+    LP                 shift, and go to state 43
+    NOT                shift, and go to state 44
+    INTEGER            shift, and go to state 45
+    STRING             shift, and go to state 46
+    VAR_NAME           shift, and go to state 47
+    FLOAT_NUMBER       shift, and go to state 48
+    TRUE               shift, and go to state 49
+    FALSE              shift, and go to state 50
+    GET_HEADINGS       shift, and go to state 12
+    GET_ALTITUDE       shift, and go to state 13
+    GET_TEMPERATURE    shift, and go to state 14
+    SET_VERTICALCLIMB  shift, and go to state 15
+    SET_HORIZONTAL     shift, and go to state 16
+    SET_HEADING        shift, and go to state 17
+    SET_SPRAY          shift, and go to state 18
+    CONNECT            shift, and go to state 19
+    SLEEP              shift, and go to state 20
+    SCAN_NEXT          shift, and go to state 21
+    PRINT_OUT          shift, and go to state 22
+
+    EXPRESSION               go to state 95
+    ARITHMETIC_EXPRESSION    go to state 52
+    ARITHMETIC_FACTOR        go to state 53
+    ARITHMETIC_COMPOSITION   go to state 54
+    LOGICAL_FACTOR           go to state 183
+    LOGICAL_COMPOSITION      go to state 56
+    LOGICAL_COMP_DUO         go to state 57
+    RELATIONAL_EXPRESSION    go to state 58
+    EQUIVALANCE_EXPRESSION   go to state 59
+    VALUE                    go to state 60
+    CONSTANT                 go to state 61
+    BOOLEAN_VAL              go to state 62
+    FUNCTION_CALL            go to state 99
+    PRIMITIVE_FUNCTION_CALL  go to state 36
+
+
+State 175
+
+   56 LOGICAL_TERM: LOGICAL_TERM AND . LOGICAL_FACTOR
+
+    LP                 shift, and go to state 43
+    NOT                shift, and go to state 44
+    INTEGER            shift, and go to state 45
+    STRING             shift, and go to state 46
+    VAR_NAME           shift, and go to state 47
+    FLOAT_NUMBER       shift, and go to state 48
+    TRUE               shift, and go to state 49
+    FALSE              shift, and go to state 50
+    GET_HEADINGS       shift, and go to state 12
+    GET_ALTITUDE       shift, and go to state 13
+    GET_TEMPERATURE    shift, and go to state 14
+    SET_VERTICALCLIMB  shift, and go to state 15
+    SET_HORIZONTAL     shift, and go to state 16
+    SET_HEADING        shift, and go to state 17
+    SET_SPRAY          shift, and go to state 18
+    CONNECT            shift, and go to state 19
+    SLEEP              shift, and go to state 20
+    SCAN_NEXT          shift, and go to state 21
+    PRINT_OUT          shift, and go to state 22
+
+    EXPRESSION               go to state 95
+    ARITHMETIC_EXPRESSION    go to state 52
+    ARITHMETIC_FACTOR        go to state 53
+    ARITHMETIC_COMPOSITION   go to state 54
+    LOGICAL_FACTOR           go to state 184
+    LOGICAL_COMPOSITION      go to state 56
+    LOGICAL_COMP_DUO         go to state 57
+    RELATIONAL_EXPRESSION    go to state 58
+    EQUIVALANCE_EXPRESSION   go to state 59
+    VALUE                    go to state 60
+    CONSTANT                 go to state 61
+    BOOLEAN_VAL              go to state 62
+    FUNCTION_CALL            go to state 99
+    PRIMITIVE_FUNCTION_CALL  go to state 36
+
+
+State 176
+
+   98 PRIMITIVE_FUNCTION_CALL: CONNECT LP STRING COMMA STRING . RP
+
+    RP  shift, and go to state 185
+
+
+State 177
+
+   82 FUNCTION_DEFINITION: FUNCTION TYPE VAR_NAME LP . ARGUMENTS RP LB STATEMENTS RB
+   83                    | FUNCTION TYPE VAR_NAME LP . RP LB STATEMENTS RB
+
+    RP     shift, and go to state 186
     VOID   shift, and go to state 6
     INT    shift, and go to state 7
     FLOAT  shift, and go to state 8
     BOOL   shift, and go to state 9
     STR    shift, and go to state 10
 
-    TYPE            go to state 167
+    TYPE            go to state 187
     PRIMITIVE_TYPE  go to state 33
-    ARGUMENTS       go to state 168
+    ARGUMENTS       go to state 188
 
 
-State 162
+State 178
 
     7 MATCHED: IF LP LOGICAL_EXPRESSION RP MATCHED ELSE . MATCHED
    10 UNMATCHED: IF LP LOGICAL_EXPRESSION RP MATCHED ELSE . UNMATCHED
@@ -2369,8 +2816,8 @@ State 162
     SCAN_NEXT          shift, and go to state 21
     PRINT_OUT          shift, and go to state 22
 
-    MATCHED                  go to state 169
-    UNMATCHED                go to state 170
+    MATCHED                  go to state 189
+    UNMATCHED                go to state 190
     NON_IF_STATEMENT         go to state 28
     DECLARATIVE_STATEMENT    go to state 29
     ITERATIVE_STATEMENT      go to state 30
@@ -2382,35 +2829,48 @@ State 162
     PRIMITIVE_FUNCTION_CALL  go to state 36
 
 
-State 163
+State 179
 
     7 MATCHED: IF LP . LOGICAL_EXPRESSION RP MATCHED ELSE MATCHED
 
-    LP            shift, and go to state 43
-    NOT           shift, and go to state 44
-    INTEGER       shift, and go to state 45
-    STRING        shift, and go to state 46
-    VAR_NAME      shift, and go to state 88
-    FLOAT_NUMBER  shift, and go to state 48
-    TRUE          shift, and go to state 49
-    FALSE         shift, and go to state 50
+    LP                 shift, and go to state 43
+    NOT                shift, and go to state 44
+    INTEGER            shift, and go to state 45
+    STRING             shift, and go to state 46
+    VAR_NAME           shift, and go to state 47
+    FLOAT_NUMBER       shift, and go to state 48
+    TRUE               shift, and go to state 49
+    FALSE              shift, and go to state 50
+    GET_HEADINGS       shift, and go to state 12
+    GET_ALTITUDE       shift, and go to state 13
+    GET_TEMPERATURE    shift, and go to state 14
+    SET_VERTICALCLIMB  shift, and go to state 15
+    SET_HORIZONTAL     shift, and go to state 16
+    SET_HEADING        shift, and go to state 17
+    SET_SPRAY          shift, and go to state 18
+    CONNECT            shift, and go to state 19
+    SLEEP              shift, and go to state 20
+    SCAN_NEXT          shift, and go to state 21
+    PRINT_OUT          shift, and go to state 22
 
-    EXPRESSION              go to state 93
-    ARITHMETIC_EXPRESSION   go to state 52
-    TERM                    go to state 53
-    FACTOR                  go to state 54
-    LOGICAL_EXPRESSION      go to state 171
-    OR_EXPRESSION           go to state 56
-    AND_EXPRESSION          go to state 57
-    BOOLEAN_FACTOR          go to state 58
-    RELATIONAL_EXPRESSION   go to state 59
-    EQUIVALANCE_EXPRESSION  go to state 60
-    VALUE                   go to state 61
-    CONSTANT                go to state 62
-    BOOLEAN_VAL             go to state 63
+    EXPRESSION               go to state 95
+    ARITHMETIC_EXPRESSION    go to state 52
+    ARITHMETIC_FACTOR        go to state 53
+    ARITHMETIC_COMPOSITION   go to state 54
+    LOGICAL_EXPRESSION       go to state 191
+    LOGICAL_FACTOR           go to state 97
+    LOGICAL_COMPOSITION      go to state 98
+    LOGICAL_COMP_DUO         go to state 57
+    RELATIONAL_EXPRESSION    go to state 58
+    EQUIVALANCE_EXPRESSION   go to state 59
+    VALUE                    go to state 60
+    CONSTANT                 go to state 61
+    BOOLEAN_VAL              go to state 62
+    FUNCTION_CALL            go to state 99
+    PRIMITIVE_FUNCTION_CALL  go to state 36
 
 
-State 164
+State 180
 
    19 ITERATIVE_STATEMENT: FOR LP NON_IF_STATEMENT SEMICOLON LOGICAL_EXPRESSION SEMICOLON . NON_IF_STATEMENT RP MATCHED
 
@@ -2436,304 +2896,7 @@ State 164
     SCAN_NEXT          shift, and go to state 21
     PRINT_OUT          shift, and go to state 22
 
-    NON_IF_STATEMENT         go to state 172
-    DECLARATIVE_STATEMENT    go to state 29
-    ITERATIVE_STATEMENT      go to state 30
-    ASSIGNMENT_STATEMENT     go to state 31
-    TYPE                     go to state 32
-    PRIMITIVE_TYPE           go to state 33
-    FUNCTION_CALL            go to state 34
-    RETURN_STATEMENT         go to state 35
-    PRIMITIVE_FUNCTION_CALL  go to state 36
-
-
-State 165
-
-   85 PRIMITIVE_FUNCTION_CALL: CONNECT LP STRING COMMA STRING RP .
-
-    $default  reduce using rule 85 (PRIMITIVE_FUNCTION_CALL)
-
-
-State 166
-
-   70 FUNCTION_DEFINITION: FUNCTION TYPE VAR_NAME LP RP . LB STATEMENTS RB
-
-    LB  shift, and go to state 173
-
-
-State 167
-
-   67 ARGUMENTS: TYPE . VAR_NAME
-
-    VAR_NAME  shift, and go to state 174
-
-
-State 168
-
-   68 ARGUMENTS: ARGUMENTS . COMMA TYPE VAR_NAME
-   69 FUNCTION_DEFINITION: FUNCTION TYPE VAR_NAME LP ARGUMENTS . RP LB STATEMENTS RB
-
-    RP     shift, and go to state 175
-    COMMA  shift, and go to state 176
-
-
-State 169
-
-    7 MATCHED: IF LP LOGICAL_EXPRESSION RP MATCHED ELSE MATCHED .
-
-    $default  reduce using rule 7 (MATCHED)
-
-
-State 170
-
-   10 UNMATCHED: IF LP LOGICAL_EXPRESSION RP MATCHED ELSE UNMATCHED .
-
-    $default  reduce using rule 10 (UNMATCHED)
-
-
-State 171
-
-    7 MATCHED: IF LP LOGICAL_EXPRESSION . RP MATCHED ELSE MATCHED
-   25 EXPRESSION: LOGICAL_EXPRESSION .
-
-    RP  shift, and go to state 177
-
-    $default  reduce using rule 25 (EXPRESSION)
-
-
-State 172
-
-   19 ITERATIVE_STATEMENT: FOR LP NON_IF_STATEMENT SEMICOLON LOGICAL_EXPRESSION SEMICOLON NON_IF_STATEMENT . RP MATCHED
-
-    RP  shift, and go to state 178
-
-
-State 173
-
-   70 FUNCTION_DEFINITION: FUNCTION TYPE VAR_NAME LP RP LB . STATEMENTS RB
-
-    LB                 shift, and go to state 1
-    VAR_NAME           shift, and go to state 2
-    IF                 shift, and go to state 3
-    WHILE              shift, and go to state 4
-    FOR                shift, and go to state 5
-    VOID               shift, and go to state 6
-    INT                shift, and go to state 7
-    FLOAT              shift, and go to state 8
-    BOOL               shift, and go to state 9
-    STR                shift, and go to state 10
-    RETURN             shift, and go to state 11
-    GET_HEADINGS       shift, and go to state 12
-    GET_ALTITUDE       shift, and go to state 13
-    GET_TEMPERATURE    shift, and go to state 14
-    SET_VERTICALCLIMB  shift, and go to state 15
-    SET_HORIZONTAL     shift, and go to state 16
-    SET_HEADING        shift, and go to state 17
-    SET_SPRAY          shift, and go to state 18
-    CONNECT            shift, and go to state 19
-    SLEEP              shift, and go to state 20
-    SCAN_NEXT          shift, and go to state 21
-    PRINT_OUT          shift, and go to state 22
-
-    STATEMENTS               go to state 179
-    STATEMENT                go to state 25
-    MATCHED                  go to state 26
-    UNMATCHED                go to state 27
-    NON_IF_STATEMENT         go to state 28
-    DECLARATIVE_STATEMENT    go to state 29
-    ITERATIVE_STATEMENT      go to state 30
-    ASSIGNMENT_STATEMENT     go to state 31
-    TYPE                     go to state 32
-    PRIMITIVE_TYPE           go to state 33
-    FUNCTION_CALL            go to state 34
-    RETURN_STATEMENT         go to state 35
-    PRIMITIVE_FUNCTION_CALL  go to state 36
-
-
-State 174
-
-   67 ARGUMENTS: TYPE VAR_NAME .
-
-    $default  reduce using rule 67 (ARGUMENTS)
-
-
-State 175
-
-   69 FUNCTION_DEFINITION: FUNCTION TYPE VAR_NAME LP ARGUMENTS RP . LB STATEMENTS RB
-
-    LB  shift, and go to state 180
-
-
-State 176
-
-   68 ARGUMENTS: ARGUMENTS COMMA . TYPE VAR_NAME
-
-    VOID   shift, and go to state 6
-    INT    shift, and go to state 7
-    FLOAT  shift, and go to state 8
-    BOOL   shift, and go to state 9
-    STR    shift, and go to state 10
-
-    TYPE            go to state 181
-    PRIMITIVE_TYPE  go to state 33
-
-
-State 177
-
-    7 MATCHED: IF LP LOGICAL_EXPRESSION RP . MATCHED ELSE MATCHED
-
-    LB                 shift, and go to state 1
-    VAR_NAME           shift, and go to state 2
-    IF                 shift, and go to state 157
-    WHILE              shift, and go to state 4
-    FOR                shift, and go to state 5
-    VOID               shift, and go to state 6
-    INT                shift, and go to state 7
-    FLOAT              shift, and go to state 8
-    BOOL               shift, and go to state 9
-    STR                shift, and go to state 10
-    RETURN             shift, and go to state 11
-    GET_HEADINGS       shift, and go to state 12
-    GET_ALTITUDE       shift, and go to state 13
-    GET_TEMPERATURE    shift, and go to state 14
-    SET_VERTICALCLIMB  shift, and go to state 15
-    SET_HORIZONTAL     shift, and go to state 16
-    SET_HEADING        shift, and go to state 17
-    SET_SPRAY          shift, and go to state 18
-    CONNECT            shift, and go to state 19
-    SLEEP              shift, and go to state 20
-    SCAN_NEXT          shift, and go to state 21
-    PRINT_OUT          shift, and go to state 22
-
-    MATCHED                  go to state 182
-    NON_IF_STATEMENT         go to state 28
-    DECLARATIVE_STATEMENT    go to state 29
-    ITERATIVE_STATEMENT      go to state 30
-    ASSIGNMENT_STATEMENT     go to state 31
-    TYPE                     go to state 32
-    PRIMITIVE_TYPE           go to state 33
-    FUNCTION_CALL            go to state 34
-    RETURN_STATEMENT         go to state 35
-    PRIMITIVE_FUNCTION_CALL  go to state 36
-
-
-State 178
-
-   19 ITERATIVE_STATEMENT: FOR LP NON_IF_STATEMENT SEMICOLON LOGICAL_EXPRESSION SEMICOLON NON_IF_STATEMENT RP . MATCHED
-
-    LB                 shift, and go to state 1
-    VAR_NAME           shift, and go to state 2
-    IF                 shift, and go to state 157
-    WHILE              shift, and go to state 4
-    FOR                shift, and go to state 5
-    VOID               shift, and go to state 6
-    INT                shift, and go to state 7
-    FLOAT              shift, and go to state 8
-    BOOL               shift, and go to state 9
-    STR                shift, and go to state 10
-    RETURN             shift, and go to state 11
-    GET_HEADINGS       shift, and go to state 12
-    GET_ALTITUDE       shift, and go to state 13
-    GET_TEMPERATURE    shift, and go to state 14
-    SET_VERTICALCLIMB  shift, and go to state 15
-    SET_HORIZONTAL     shift, and go to state 16
-    SET_HEADING        shift, and go to state 17
-    SET_SPRAY          shift, and go to state 18
-    CONNECT            shift, and go to state 19
-    SLEEP              shift, and go to state 20
-    SCAN_NEXT          shift, and go to state 21
-    PRINT_OUT          shift, and go to state 22
-
-    MATCHED                  go to state 183
-    NON_IF_STATEMENT         go to state 28
-    DECLARATIVE_STATEMENT    go to state 29
-    ITERATIVE_STATEMENT      go to state 30
-    ASSIGNMENT_STATEMENT     go to state 31
-    TYPE                     go to state 32
-    PRIMITIVE_TYPE           go to state 33
-    FUNCTION_CALL            go to state 34
-    RETURN_STATEMENT         go to state 35
-    PRIMITIVE_FUNCTION_CALL  go to state 36
-
-
-State 179
-
-    3 STATEMENTS: STATEMENTS . STATEMENT
-    4           | STATEMENTS . FUNCTION_DEFINITION
-   70 FUNCTION_DEFINITION: FUNCTION TYPE VAR_NAME LP RP LB STATEMENTS . RB
-
-    LB                 shift, and go to state 1
-    RB                 shift, and go to state 184
-    VAR_NAME           shift, and go to state 2
-    IF                 shift, and go to state 3
-    WHILE              shift, and go to state 4
-    FOR                shift, and go to state 5
-    VOID               shift, and go to state 6
-    INT                shift, and go to state 7
-    FLOAT              shift, and go to state 8
-    BOOL               shift, and go to state 9
-    STR                shift, and go to state 10
-    FUNCTION           shift, and go to state 77
-    RETURN             shift, and go to state 11
-    GET_HEADINGS       shift, and go to state 12
-    GET_ALTITUDE       shift, and go to state 13
-    GET_TEMPERATURE    shift, and go to state 14
-    SET_VERTICALCLIMB  shift, and go to state 15
-    SET_HORIZONTAL     shift, and go to state 16
-    SET_HEADING        shift, and go to state 17
-    SET_SPRAY          shift, and go to state 18
-    CONNECT            shift, and go to state 19
-    SLEEP              shift, and go to state 20
-    SCAN_NEXT          shift, and go to state 21
-    PRINT_OUT          shift, and go to state 22
-
-    STATEMENT                go to state 78
-    MATCHED                  go to state 26
-    UNMATCHED                go to state 27
-    NON_IF_STATEMENT         go to state 28
-    DECLARATIVE_STATEMENT    go to state 29
-    ITERATIVE_STATEMENT      go to state 30
-    ASSIGNMENT_STATEMENT     go to state 31
-    TYPE                     go to state 32
-    PRIMITIVE_TYPE           go to state 33
-    FUNCTION_DEFINITION      go to state 79
-    FUNCTION_CALL            go to state 34
-    RETURN_STATEMENT         go to state 35
-    PRIMITIVE_FUNCTION_CALL  go to state 36
-
-
-State 180
-
-   69 FUNCTION_DEFINITION: FUNCTION TYPE VAR_NAME LP ARGUMENTS RP LB . STATEMENTS RB
-
-    LB                 shift, and go to state 1
-    VAR_NAME           shift, and go to state 2
-    IF                 shift, and go to state 3
-    WHILE              shift, and go to state 4
-    FOR                shift, and go to state 5
-    VOID               shift, and go to state 6
-    INT                shift, and go to state 7
-    FLOAT              shift, and go to state 8
-    BOOL               shift, and go to state 9
-    STR                shift, and go to state 10
-    RETURN             shift, and go to state 11
-    GET_HEADINGS       shift, and go to state 12
-    GET_ALTITUDE       shift, and go to state 13
-    GET_TEMPERATURE    shift, and go to state 14
-    SET_VERTICALCLIMB  shift, and go to state 15
-    SET_HORIZONTAL     shift, and go to state 16
-    SET_HEADING        shift, and go to state 17
-    SET_SPRAY          shift, and go to state 18
-    CONNECT            shift, and go to state 19
-    SLEEP              shift, and go to state 20
-    SCAN_NEXT          shift, and go to state 21
-    PRINT_OUT          shift, and go to state 22
-
-    STATEMENTS               go to state 185
-    STATEMENT                go to state 25
-    MATCHED                  go to state 26
-    UNMATCHED                go to state 27
-    NON_IF_STATEMENT         go to state 28
+    NON_IF_STATEMENT         go to state 192
     DECLARATIVE_STATEMENT    go to state 29
     ITERATIVE_STATEMENT      go to state 30
     ASSIGNMENT_STATEMENT     go to state 31
@@ -2746,40 +2909,103 @@ State 180
 
 State 181
 
-   68 ARGUMENTS: ARGUMENTS COMMA TYPE . VAR_NAME
+   39 ARITHMETIC_TERM: ARITHMETIC_FACTOR ADDITIVE_OPERATOR ARITHMETIC_FACTOR .
 
-    VAR_NAME  shift, and go to state 186
+    $default  reduce using rule 39 (ARITHMETIC_TERM)
 
 
 State 182
 
-    7 MATCHED: IF LP LOGICAL_EXPRESSION RP MATCHED . ELSE MATCHED
+   38 ARITHMETIC_TERM: ARITHMETIC_TERM ADDITIVE_OPERATOR ARITHMETIC_FACTOR .
 
-    ELSE  shift, and go to state 187
+    $default  reduce using rule 38 (ARITHMETIC_TERM)
 
 
 State 183
 
-   19 ITERATIVE_STATEMENT: FOR LP NON_IF_STATEMENT SEMICOLON LOGICAL_EXPRESSION SEMICOLON NON_IF_STATEMENT RP MATCHED .
+   57 LOGICAL_TERM_DUO: LOGICAL_FACTOR AND LOGICAL_FACTOR .
+   58 LOGICAL_COMP_DUO: LOGICAL_FACTOR . OR LOGICAL_FACTOR
 
-    $default  reduce using rule 19 (ITERATIVE_STATEMENT)
+    OR  shift, and go to state 116
+
+    OR        [reduce using rule 57 (LOGICAL_TERM_DUO)]
+    $default  reduce using rule 57 (LOGICAL_TERM_DUO)
 
 
 State 184
 
-   70 FUNCTION_DEFINITION: FUNCTION TYPE VAR_NAME LP RP LB STATEMENTS RB .
+   56 LOGICAL_TERM: LOGICAL_TERM AND LOGICAL_FACTOR .
+   58 LOGICAL_COMP_DUO: LOGICAL_FACTOR . OR LOGICAL_FACTOR
 
-    $default  reduce using rule 70 (FUNCTION_DEFINITION)
+    OR  shift, and go to state 116
+
+    OR        [reduce using rule 56 (LOGICAL_TERM)]
+    $default  reduce using rule 56 (LOGICAL_TERM)
 
 
 State 185
 
-    3 STATEMENTS: STATEMENTS . STATEMENT
-    4           | STATEMENTS . FUNCTION_DEFINITION
-   69 FUNCTION_DEFINITION: FUNCTION TYPE VAR_NAME LP ARGUMENTS RP LB STATEMENTS . RB
+   98 PRIMITIVE_FUNCTION_CALL: CONNECT LP STRING COMMA STRING RP .
+
+    $default  reduce using rule 98 (PRIMITIVE_FUNCTION_CALL)
+
+
+State 186
+
+   83 FUNCTION_DEFINITION: FUNCTION TYPE VAR_NAME LP RP . LB STATEMENTS RB
+
+    LB  shift, and go to state 193
+
+
+State 187
+
+   80 ARGUMENTS: TYPE . VAR_NAME
+
+    VAR_NAME  shift, and go to state 194
+
+
+State 188
+
+   81 ARGUMENTS: ARGUMENTS . COMMA TYPE VAR_NAME
+   82 FUNCTION_DEFINITION: FUNCTION TYPE VAR_NAME LP ARGUMENTS . RP LB STATEMENTS RB
+
+    RP     shift, and go to state 195
+    COMMA  shift, and go to state 196
+
+
+State 189
+
+    7 MATCHED: IF LP LOGICAL_EXPRESSION RP MATCHED ELSE MATCHED .
+
+    $default  reduce using rule 7 (MATCHED)
+
+
+State 190
+
+   10 UNMATCHED: IF LP LOGICAL_EXPRESSION RP MATCHED ELSE UNMATCHED .
+
+    $default  reduce using rule 10 (UNMATCHED)
+
+
+State 191
+
+    7 MATCHED: IF LP LOGICAL_EXPRESSION . RP MATCHED ELSE MATCHED
+
+    RP  shift, and go to state 197
+
+
+State 192
+
+   19 ITERATIVE_STATEMENT: FOR LP NON_IF_STATEMENT SEMICOLON LOGICAL_EXPRESSION SEMICOLON NON_IF_STATEMENT . RP MATCHED
+
+    RP  shift, and go to state 198
+
+
+State 193
+
+   83 FUNCTION_DEFINITION: FUNCTION TYPE VAR_NAME LP RP LB . STATEMENTS RB
 
     LB                 shift, and go to state 1
-    RB                 shift, and go to state 188
     VAR_NAME           shift, and go to state 2
     IF                 shift, and go to state 3
     WHILE              shift, and go to state 4
@@ -2789,7 +3015,6 @@ State 185
     FLOAT              shift, and go to state 8
     BOOL               shift, and go to state 9
     STR                shift, and go to state 10
-    FUNCTION           shift, and go to state 77
     RETURN             shift, and go to state 11
     GET_HEADINGS       shift, and go to state 12
     GET_ALTITUDE       shift, and go to state 13
@@ -2803,7 +3028,8 @@ State 185
     SCAN_NEXT          shift, and go to state 21
     PRINT_OUT          shift, and go to state 22
 
-    STATEMENT                go to state 78
+    STATEMENTS               go to state 199
+    STATEMENT                go to state 25
     MATCHED                  go to state 26
     UNMATCHED                go to state 27
     NON_IF_STATEMENT         go to state 28
@@ -2812,26 +3038,46 @@ State 185
     ASSIGNMENT_STATEMENT     go to state 31
     TYPE                     go to state 32
     PRIMITIVE_TYPE           go to state 33
-    FUNCTION_DEFINITION      go to state 79
     FUNCTION_CALL            go to state 34
     RETURN_STATEMENT         go to state 35
     PRIMITIVE_FUNCTION_CALL  go to state 36
 
 
-State 186
+State 194
 
-   68 ARGUMENTS: ARGUMENTS COMMA TYPE VAR_NAME .
+   80 ARGUMENTS: TYPE VAR_NAME .
 
-    $default  reduce using rule 68 (ARGUMENTS)
+    $default  reduce using rule 80 (ARGUMENTS)
 
 
-State 187
+State 195
 
-    7 MATCHED: IF LP LOGICAL_EXPRESSION RP MATCHED ELSE . MATCHED
+   82 FUNCTION_DEFINITION: FUNCTION TYPE VAR_NAME LP ARGUMENTS RP . LB STATEMENTS RB
+
+    LB  shift, and go to state 200
+
+
+State 196
+
+   81 ARGUMENTS: ARGUMENTS COMMA . TYPE VAR_NAME
+
+    VOID   shift, and go to state 6
+    INT    shift, and go to state 7
+    FLOAT  shift, and go to state 8
+    BOOL   shift, and go to state 9
+    STR    shift, and go to state 10
+
+    TYPE            go to state 201
+    PRIMITIVE_TYPE  go to state 33
+
+
+State 197
+
+    7 MATCHED: IF LP LOGICAL_EXPRESSION RP . MATCHED ELSE MATCHED
 
     LB                 shift, and go to state 1
     VAR_NAME           shift, and go to state 2
-    IF                 shift, and go to state 157
+    IF                 shift, and go to state 167
     WHILE              shift, and go to state 4
     FOR                shift, and go to state 5
     VOID               shift, and go to state 6
@@ -2852,7 +3098,7 @@ State 187
     SCAN_NEXT          shift, and go to state 21
     PRINT_OUT          shift, and go to state 22
 
-    MATCHED                  go to state 169
+    MATCHED                  go to state 202
     NON_IF_STATEMENT         go to state 28
     DECLARATIVE_STATEMENT    go to state 29
     ITERATIVE_STATEMENT      go to state 30
@@ -2864,8 +3110,255 @@ State 187
     PRIMITIVE_FUNCTION_CALL  go to state 36
 
 
-State 188
+State 198
 
-   69 FUNCTION_DEFINITION: FUNCTION TYPE VAR_NAME LP ARGUMENTS RP LB STATEMENTS RB .
+   19 ITERATIVE_STATEMENT: FOR LP NON_IF_STATEMENT SEMICOLON LOGICAL_EXPRESSION SEMICOLON NON_IF_STATEMENT RP . MATCHED
 
-    $default  reduce using rule 69 (FUNCTION_DEFINITION)
+    LB                 shift, and go to state 1
+    VAR_NAME           shift, and go to state 2
+    IF                 shift, and go to state 167
+    WHILE              shift, and go to state 4
+    FOR                shift, and go to state 5
+    VOID               shift, and go to state 6
+    INT                shift, and go to state 7
+    FLOAT              shift, and go to state 8
+    BOOL               shift, and go to state 9
+    STR                shift, and go to state 10
+    RETURN             shift, and go to state 11
+    GET_HEADINGS       shift, and go to state 12
+    GET_ALTITUDE       shift, and go to state 13
+    GET_TEMPERATURE    shift, and go to state 14
+    SET_VERTICALCLIMB  shift, and go to state 15
+    SET_HORIZONTAL     shift, and go to state 16
+    SET_HEADING        shift, and go to state 17
+    SET_SPRAY          shift, and go to state 18
+    CONNECT            shift, and go to state 19
+    SLEEP              shift, and go to state 20
+    SCAN_NEXT          shift, and go to state 21
+    PRINT_OUT          shift, and go to state 22
+
+    MATCHED                  go to state 203
+    NON_IF_STATEMENT         go to state 28
+    DECLARATIVE_STATEMENT    go to state 29
+    ITERATIVE_STATEMENT      go to state 30
+    ASSIGNMENT_STATEMENT     go to state 31
+    TYPE                     go to state 32
+    PRIMITIVE_TYPE           go to state 33
+    FUNCTION_CALL            go to state 34
+    RETURN_STATEMENT         go to state 35
+    PRIMITIVE_FUNCTION_CALL  go to state 36
+
+
+State 199
+
+    3 STATEMENTS: STATEMENTS . STATEMENT
+    4           | STATEMENTS . FUNCTION_DEFINITION
+   83 FUNCTION_DEFINITION: FUNCTION TYPE VAR_NAME LP RP LB STATEMENTS . RB
+
+    LB                 shift, and go to state 1
+    RB                 shift, and go to state 204
+    VAR_NAME           shift, and go to state 2
+    IF                 shift, and go to state 3
+    WHILE              shift, and go to state 4
+    FOR                shift, and go to state 5
+    VOID               shift, and go to state 6
+    INT                shift, and go to state 7
+    FLOAT              shift, and go to state 8
+    BOOL               shift, and go to state 9
+    STR                shift, and go to state 10
+    FUNCTION           shift, and go to state 76
+    RETURN             shift, and go to state 11
+    GET_HEADINGS       shift, and go to state 12
+    GET_ALTITUDE       shift, and go to state 13
+    GET_TEMPERATURE    shift, and go to state 14
+    SET_VERTICALCLIMB  shift, and go to state 15
+    SET_HORIZONTAL     shift, and go to state 16
+    SET_HEADING        shift, and go to state 17
+    SET_SPRAY          shift, and go to state 18
+    CONNECT            shift, and go to state 19
+    SLEEP              shift, and go to state 20
+    SCAN_NEXT          shift, and go to state 21
+    PRINT_OUT          shift, and go to state 22
+
+    STATEMENT                go to state 77
+    MATCHED                  go to state 26
+    UNMATCHED                go to state 27
+    NON_IF_STATEMENT         go to state 28
+    DECLARATIVE_STATEMENT    go to state 29
+    ITERATIVE_STATEMENT      go to state 30
+    ASSIGNMENT_STATEMENT     go to state 31
+    TYPE                     go to state 32
+    PRIMITIVE_TYPE           go to state 33
+    FUNCTION_DEFINITION      go to state 78
+    FUNCTION_CALL            go to state 34
+    RETURN_STATEMENT         go to state 35
+    PRIMITIVE_FUNCTION_CALL  go to state 36
+
+
+State 200
+
+   82 FUNCTION_DEFINITION: FUNCTION TYPE VAR_NAME LP ARGUMENTS RP LB . STATEMENTS RB
+
+    LB                 shift, and go to state 1
+    VAR_NAME           shift, and go to state 2
+    IF                 shift, and go to state 3
+    WHILE              shift, and go to state 4
+    FOR                shift, and go to state 5
+    VOID               shift, and go to state 6
+    INT                shift, and go to state 7
+    FLOAT              shift, and go to state 8
+    BOOL               shift, and go to state 9
+    STR                shift, and go to state 10
+    RETURN             shift, and go to state 11
+    GET_HEADINGS       shift, and go to state 12
+    GET_ALTITUDE       shift, and go to state 13
+    GET_TEMPERATURE    shift, and go to state 14
+    SET_VERTICALCLIMB  shift, and go to state 15
+    SET_HORIZONTAL     shift, and go to state 16
+    SET_HEADING        shift, and go to state 17
+    SET_SPRAY          shift, and go to state 18
+    CONNECT            shift, and go to state 19
+    SLEEP              shift, and go to state 20
+    SCAN_NEXT          shift, and go to state 21
+    PRINT_OUT          shift, and go to state 22
+
+    STATEMENTS               go to state 205
+    STATEMENT                go to state 25
+    MATCHED                  go to state 26
+    UNMATCHED                go to state 27
+    NON_IF_STATEMENT         go to state 28
+    DECLARATIVE_STATEMENT    go to state 29
+    ITERATIVE_STATEMENT      go to state 30
+    ASSIGNMENT_STATEMENT     go to state 31
+    TYPE                     go to state 32
+    PRIMITIVE_TYPE           go to state 33
+    FUNCTION_CALL            go to state 34
+    RETURN_STATEMENT         go to state 35
+    PRIMITIVE_FUNCTION_CALL  go to state 36
+
+
+State 201
+
+   81 ARGUMENTS: ARGUMENTS COMMA TYPE . VAR_NAME
+
+    VAR_NAME  shift, and go to state 206
+
+
+State 202
+
+    7 MATCHED: IF LP LOGICAL_EXPRESSION RP MATCHED . ELSE MATCHED
+
+    ELSE  shift, and go to state 207
+
+
+State 203
+
+   19 ITERATIVE_STATEMENT: FOR LP NON_IF_STATEMENT SEMICOLON LOGICAL_EXPRESSION SEMICOLON NON_IF_STATEMENT RP MATCHED .
+
+    $default  reduce using rule 19 (ITERATIVE_STATEMENT)
+
+
+State 204
+
+   83 FUNCTION_DEFINITION: FUNCTION TYPE VAR_NAME LP RP LB STATEMENTS RB .
+
+    $default  reduce using rule 83 (FUNCTION_DEFINITION)
+
+
+State 205
+
+    3 STATEMENTS: STATEMENTS . STATEMENT
+    4           | STATEMENTS . FUNCTION_DEFINITION
+   82 FUNCTION_DEFINITION: FUNCTION TYPE VAR_NAME LP ARGUMENTS RP LB STATEMENTS . RB
+
+    LB                 shift, and go to state 1
+    RB                 shift, and go to state 208
+    VAR_NAME           shift, and go to state 2
+    IF                 shift, and go to state 3
+    WHILE              shift, and go to state 4
+    FOR                shift, and go to state 5
+    VOID               shift, and go to state 6
+    INT                shift, and go to state 7
+    FLOAT              shift, and go to state 8
+    BOOL               shift, and go to state 9
+    STR                shift, and go to state 10
+    FUNCTION           shift, and go to state 76
+    RETURN             shift, and go to state 11
+    GET_HEADINGS       shift, and go to state 12
+    GET_ALTITUDE       shift, and go to state 13
+    GET_TEMPERATURE    shift, and go to state 14
+    SET_VERTICALCLIMB  shift, and go to state 15
+    SET_HORIZONTAL     shift, and go to state 16
+    SET_HEADING        shift, and go to state 17
+    SET_SPRAY          shift, and go to state 18
+    CONNECT            shift, and go to state 19
+    SLEEP              shift, and go to state 20
+    SCAN_NEXT          shift, and go to state 21
+    PRINT_OUT          shift, and go to state 22
+
+    STATEMENT                go to state 77
+    MATCHED                  go to state 26
+    UNMATCHED                go to state 27
+    NON_IF_STATEMENT         go to state 28
+    DECLARATIVE_STATEMENT    go to state 29
+    ITERATIVE_STATEMENT      go to state 30
+    ASSIGNMENT_STATEMENT     go to state 31
+    TYPE                     go to state 32
+    PRIMITIVE_TYPE           go to state 33
+    FUNCTION_DEFINITION      go to state 78
+    FUNCTION_CALL            go to state 34
+    RETURN_STATEMENT         go to state 35
+    PRIMITIVE_FUNCTION_CALL  go to state 36
+
+
+State 206
+
+   81 ARGUMENTS: ARGUMENTS COMMA TYPE VAR_NAME .
+
+    $default  reduce using rule 81 (ARGUMENTS)
+
+
+State 207
+
+    7 MATCHED: IF LP LOGICAL_EXPRESSION RP MATCHED ELSE . MATCHED
+
+    LB                 shift, and go to state 1
+    VAR_NAME           shift, and go to state 2
+    IF                 shift, and go to state 167
+    WHILE              shift, and go to state 4
+    FOR                shift, and go to state 5
+    VOID               shift, and go to state 6
+    INT                shift, and go to state 7
+    FLOAT              shift, and go to state 8
+    BOOL               shift, and go to state 9
+    STR                shift, and go to state 10
+    RETURN             shift, and go to state 11
+    GET_HEADINGS       shift, and go to state 12
+    GET_ALTITUDE       shift, and go to state 13
+    GET_TEMPERATURE    shift, and go to state 14
+    SET_VERTICALCLIMB  shift, and go to state 15
+    SET_HORIZONTAL     shift, and go to state 16
+    SET_HEADING        shift, and go to state 17
+    SET_SPRAY          shift, and go to state 18
+    CONNECT            shift, and go to state 19
+    SLEEP              shift, and go to state 20
+    SCAN_NEXT          shift, and go to state 21
+    PRINT_OUT          shift, and go to state 22
+
+    MATCHED                  go to state 189
+    NON_IF_STATEMENT         go to state 28
+    DECLARATIVE_STATEMENT    go to state 29
+    ITERATIVE_STATEMENT      go to state 30
+    ASSIGNMENT_STATEMENT     go to state 31
+    TYPE                     go to state 32
+    PRIMITIVE_TYPE           go to state 33
+    FUNCTION_CALL            go to state 34
+    RETURN_STATEMENT         go to state 35
+    PRIMITIVE_FUNCTION_CALL  go to state 36
+
+
+State 208
+
+   82 FUNCTION_DEFINITION: FUNCTION TYPE VAR_NAME LP ARGUMENTS RP LB STATEMENTS RB .
+
+    $default  reduce using rule 82 (FUNCTION_DEFINITION)
