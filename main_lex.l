@@ -65,6 +65,7 @@ CONNECT           connect
 SLEEP             sleep
 SCAN_NEXT         scanNext
 PRINT_OUT         printOut
+MAIN              main
 
 %x COMMENT
 %%
@@ -109,6 +110,7 @@ PRINT_OUT         printOut
 {SLEEP} printf("SLEEP ");
 {SCAN_NEXT} printf("SCAN_NEXT ");
 {PRINT_OUT} printf("PRINT_OUT ");
+{MAIN} printf("MAIN ");
 
    
 {INT}   printf("INT ");

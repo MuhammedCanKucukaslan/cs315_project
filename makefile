@@ -1,12 +1,11 @@
 DATE = `date +'%y_%m_%d_%H_%M_%S'`
 
-
 compile: l y gcc
 	
 run: compile
-	./main
+	./parser
 gcc:
-	gcc -o main y.tab.c
+	gcc -o parser y.tab.c
 lex:
 	lex main_lex.l
 	gcc lex.yy.c -o lex
@@ -22,13 +21,13 @@ new:
 	cp main.l ./archive/"main_$(DATE).l"
 	nano main.l
 clear:
-	rm -f  main
+	rm -f  parser
 	rm -f  lex.yy.c
-	touch main.l
+	touch parser.l
 
-v:
-	cat valid | ./main
-i:
-	cat invalid | ./main
+v: compile
+	cat valid | ./parser
+i: compile
+	cat invalid | ./parser
 d:
 	yacc -v main.y

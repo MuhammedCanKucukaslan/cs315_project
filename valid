@@ -1,5 +1,28 @@
-3 + 5
-*2
-/6
-++3
+function int main (str args) {
+    int length;
+    length = 10;
+    int width = 20;
+    bool b ;
+    b = 1 < 3;
+    b = a < b;
+    
+    /* go over the rectangle with length and width */
+    setSpray(true);
+    setHeading(0);
+    for (int i = 0;
+     i < length; 
+     i = i + 1) {
+        for (int j = 0; j < width; j = j + 1) {
+            /* wait for a second to spray */ 
+            sleep( 1000);
+        }
+    }
+    printOut( "done spraying");
+   
+    /*
+        I recommend you to try more edge cases especially for project 2.
+        - such as calling function inside a loop, empty brackets, empty returns, nested conditionals loops and other expressions etc.
+        Test files should resemble a drone-related programming task.
+    */ 
+}
 

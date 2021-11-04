@@ -62,17 +62,22 @@
 %token SLEEP
 %token SCAN_NEXT
 %token PRINT_OUT
+%token MAIN
 
 %%
 
 //-------------------------------------------
 // Statements
-PROGRAM : STATEMENTS
+PROGRAM : FUNCTIONS
 
+FUNCTIONS: MAIN_FUNCTION
+    | FUNCTIONS FUNCTION_DEFINITION
 
+MAIN_FUNCTION: FUNCTION TYPE MAIN LP ARGUMENTS RP  LB STATEMENTS RB
+    | FUNCTION TYPE MAIN LP   RP  LB STATEMENTS RB
+    
 STATEMENTS: STATEMENT // SEMICOLON // moved to NON_IF_STATEMENT part
     | STATEMENTS STATEMENT // SEMICOLON // moved to NON_IF_STATEMENT part
-    | STATEMENTS FUNCTION_DEFINITION // addition to original bnf grammar
 
 STATEMENT : MATCHED
     | UNMATCHED
@@ -94,6 +99,11 @@ NON_IF_STATEMENT : ITERATIVE_STATEMENT // no SEMICOLON after loop: "while() { ..
     | ASSIGNMENT_STATEMENT SEMICOLON
     | FUNCTION_CALL SEMICOLON
     | RETURN_STATEMENT SEMICOLON
+
+NORMAL_STATEMENT :
+    | DECLARATIVE_STATEMENT
+    | ASSIGNMENT_STATEMENT
+    | FUNCTION_CALL
 // END OF Non-conditional Statements
 
 //-------------------------------------------
@@ -104,7 +114,7 @@ DECLARATIVE_STATEMENT : TYPE VAR_NAME // combined with VARIABLE_DECLARATION
 //-------------------------------------------
 // Loops- ITERATIVE_STATEMENT
 ITERATIVE_STATEMENT  :  WHILE LP  LOGICAL_EXPRESSION  RP  MATCHED // curly brackets are removed from the original grammar
-    | FOR LP  NON_IF_STATEMENT SEMICOLON LOGICAL_EXPRESSION SEMICOLON NON_IF_STATEMENT RP MATCHED  // curly brackets are removed from the original grammar
+    | FOR LP  NORMAL_STATEMENT SEMICOLON LOGICAL_EXPRESSION SEMICOLON NORMAL_STATEMENT RP MATCHED  // curly brackets are removed from the original grammar
 // END OF Loops
 
 //-------------------------------------------
