@@ -69,7 +69,7 @@ PRINT_OUT         printOut
 {COMMA}      return(COMMA);
 {SEMICOLON}  return(SEMICOLON);
 
-"/*"           { BEGIN(COMMENT); return(COMMENT);}
+"/*"           { BEGIN(COMMENT);}
 <COMMENT>"*/" { BEGIN(INITIAL); }
 <COMMENT>\n   { }
 <COMMENT>.    { }
