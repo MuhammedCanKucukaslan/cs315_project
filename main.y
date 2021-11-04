@@ -70,10 +70,9 @@
 PROGRAM : STATEMENTS
 
 
-STATEMENTS: STATEMENT SEMICOLON 
-    | STATEMENTS STATEMENT SEMICOLON
+STATEMENTS: STATEMENT // SEMICOLON // moved to NON_IF_STATEMENT part 
+    | STATEMENTS STATEMENT // SEMICOLON // moved to NON_IF_STATEMENT part 
     | STATEMENTS FUNCTION_DEFINITION // addition to original bnf grammar
-    | LB STATEMENTS RB 
 
 STATEMENT : MATCHED 
     | UNMATCHED 
@@ -89,12 +88,12 @@ UNMATCHED : IF LP LOGICAL_EXPRESSION RP  STATEMENT
 
 //-------------------------------------------
 // Non-conditional Statements
-NON_IF_STATEMENT : ITERATIVE_STATEMENT 
+NON_IF_STATEMENT : ITERATIVE_STATEMENT // no SEMICOLON after loop: "while() { ... }"  
     | LB STATEMENTS RB 
-    | DECLARATIVE_STATEMENT
-    | ASSIGNMENT_STATEMENT
-    | FUNCTION_CALL
-    | RETURN_STATEMENT
+    | DECLARATIVE_STATEMENT SEMICOLON
+    | ASSIGNMENT_STATEMENT SEMICOLON
+    | FUNCTION_CALL SEMICOLON
+    | RETURN_STATEMENT SEMICOLON
 // END OF Non-conditional Statements
 
 //-------------------------------------------
@@ -105,7 +104,7 @@ DECLARATIVE_STATEMENT : TYPE VAR_NAME // combined with VARIABLE_DECLARATION
 //-------------------------------------------
 // Loops- ITERATIVE_STATEMENT
 ITERATIVE_STATEMENT  :  WHILE LP  LOGICAL_EXPRESSION  RP  MATCHED // curly brackets are removed from the original grammar
-    | FOR LP  STATEMENT SEMICOLON LOGICAL_EXPRESSION SEMICOLON STATEMENT RP MATCHED  // curly brackets are removed from the original grammar
+    | FOR LP  NON_IF_STATEMENT SEMICOLON LOGICAL_EXPRESSION SEMICOLON NON_IF_STATEMENT RP MATCHED  // curly brackets are removed from the original grammar
 // END OF Loops
 
 //-------------------------------------------
