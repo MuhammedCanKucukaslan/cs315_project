@@ -63,7 +63,7 @@ CONNECT           connect
 SLEEP             sleep
 SCAN_NEXT         scanNext
 PRINT_OUT         printOut
-
+MAIN              main
 %x COMMENT
 %%
 {COMMA}      return(COMMA);
@@ -117,7 +117,7 @@ PRINT_OUT         printOut
 {FALSE}   return(FALSE);
 {FUNCTION}   return(FUNCTION);
 {RETURN}   return(RETURN);
-
+{MAIN}   return(MAIN);
 {FLOAT_NUMBER}  return(FLOAT_NUMBER);
 {INTEGER} return(INTEGER);
 
