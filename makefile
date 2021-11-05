@@ -12,22 +12,25 @@ lex:
 	touch main_lex.l
 	./lex
 l:
-	lex main.l
-	touch main.l
+	lex CS315f21_team40.lex
+	touch CS315f21_team40.lex
 y:
-	yacc main.y
+	yacc CS315f21_team40.yacc
 new:
 	#cp main.l "main.l.prev"
-	cp main.l ./archive/"main_$(DATE).l"
-	nano main.l
+	cp CS315f21_team40.lex ./archive/"main_$(DATE).l"
+	nano CS315f21_team40.lex
 clear:
 	rm -f  parser
 	rm -f  lex.yy.c
-	touch parser.l
+	rm -f y.tab.c
+	touch CS315f21_team40.lex
 
+test: compile
+	cat CS315f21_team40.test | ./parser
 v: compile
-	cat valid | ./parser
+	cat CS315f21_team40.test | ./parser
 i: compile
 	cat invalid | ./parser
 d:
-	yacc -v main.y
+	yacc -v CS315f21_team40.yacc

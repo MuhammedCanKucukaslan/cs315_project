@@ -223,7 +223,7 @@ PRIMITIVE_FUNCTION_CALL : GET_HEADINGS LP  RP
 int lineno=0;
 int yyerror( char *s ) { fprintf( stderr, "%s: in line %d\n", s, 1+ lineno); }
 
-main() {
+int main() {
    yyparse();
 	if(yynerrs < 1){
 		printf("Parsing: SUCCESSFUL!\n");
