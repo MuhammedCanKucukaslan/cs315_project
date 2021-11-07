@@ -59,16 +59,21 @@ function int main (str args)
 	spin();
 	zigzag();
 	sleep(1);
-    
+    bool neq ;
+    neq = a != c;
     return 0;
 }
 
 /* This function draws a straight line with length of length in meters,
  towards the direction in degrees over 360
  it DOES NOT OPEN/CLOSE THE SPRAYER */
-function void goStraightTowards(int length, int direction) 
+function void goStraightTowards(int direction, int length) 
 {
-    setHeading(direction);
+    /* Set the direction of the drone */
+    for(int k = 0; k < direction; k = k + 1)
+    {
+        setHeading(true);
+    }
     setHorizontal(1); /* start moving forward */
     for (int i = 0; i < length; i = i + 1) {
         
@@ -114,7 +119,9 @@ function bool goOverEquilateralTriangle(int length)
     }
     int l = length;
     /* go over the triangle*/
+    /* First line*/
     goStraightTowards(0, l);
+    /* rest, each being shorter than the previous*/
     while ( 0 < l) {
         goStraightTowards(120, l);
         l = l - 1;
