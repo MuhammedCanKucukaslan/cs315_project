@@ -14,6 +14,7 @@ ADD       [+]
 SUB       [-]
 MUL       [*]
 DIV       [/]
+MOD       [%]
 
 SPACE     [ ]
 ANYCHAR   .
@@ -95,6 +96,7 @@ MAIN              main
 {SUB}     return(SUB);
 {MUL}     return(MUL);
 {DIV}     return(DIV);
+{MOD}     return(MOD);
 
 
 {GET_HEADINGS} return(GET_HEADINGS);

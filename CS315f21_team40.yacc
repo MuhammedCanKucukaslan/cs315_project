@@ -14,6 +14,7 @@
 %token SUB
 %token MUL
 %token DIV
+%token MOD
 
 %token SPACE
 %token ANYCHAR
@@ -140,7 +141,7 @@ FACTOR : VALUE
     | LP EXPRESSION RP
 
 ADDITIVE_OPERATOR : ADD | SUB
-MULTIPLICATIVE_OPERATOR :  MUL | DIV
+MULTIPLICATIVE_OPERATOR :  MUL | DIV | MOD
 // END OF Arithmetic
 
 // Boolean
