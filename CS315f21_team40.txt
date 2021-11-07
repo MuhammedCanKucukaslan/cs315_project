@@ -1,0 +1,184 @@
+/*
+    This is the main function for the project 2.
+    You can change the code here to test your code.
+    You can also add more functions to this file.
+    */
+
+function int main (str args) 
+{
+    int /* You can put comments between the tokens */ length;
+    length = 10;
+    int width = 20;
+    bool b ;
+    b = 1 < 3;
+    b = a < b;
+    
+    /* go over a rectangle with length and width */
+    setSpray(true);
+    goOverRectangle(length, width);
+    setSpray(false);
+    printOut( "done spraying the rectangle");
+
+    /* go over an equilateral triangle with given length */
+    setSpray(true);
+    goOverTriangle(length);
+    setSpray(false);
+    printOut( "done spraying the triangular area");
+
+    /* Testing the methods */
+    connect("eduroam", "password123");
+	int tempature = getTempature();
+	str message = setVerticalClimbOrSpray(tempature);
+	printOut(message);
+	spin();
+	zigzag();
+	sleep(1);
+    
+    return 0;
+}
+
+/* This function draws a straight line with length of length in meters,
+ towards the direction in degrees over 360
+ it DOES NOT OPEN/CLOSE THE SPRAYER */
+function void goStraightTowards(int length, int direction) 
+{
+    setHeading(direction);
+    setHorizontal(1); /* start moving forward */
+    for (int i = 0; i < length; i = i + 1) {
+        
+        /* for each meter sleep the program for one second
+        so that it actually moves for <length> meters  */
+        sleep(1000); 
+    }
+    setHorizontal(0); /* stop moving */
+
+}
+
+/* Traverse over a rectangular area 
+with length and width given in meters
+ it DOES NOT OPEN/CLOSE THE SPRAYER */
+function bool goOverRectangle(int length, int width) 
+{
+    if(length < 0 || width < 0) {
+        return false;
+    }
+    /* go over the rectangle with length and width */
+    for (int i = 0; i < length; i = i + 1) {
+        int remainder = remainder(i, 2);
+        if (  remainder == 0) 
+        {
+            goStraightTowards(270,width);
+            goStraightTowards(90, 1);
+        } else {
+            goStraightTowards(90,width);
+            goStraightTowards(270, 1);
+        }
+    }
+    return true;
+}
+
+/* Traverse over an equilateral triangular area
+with edge length given in meters
+ it DOES NOT OPEN/CLOSE THE SPRAYER */
+function bool goOverEquilateralTriangle(int length) 
+{
+    if( length < 0)
+    {
+        return false;
+    }
+    int l = length;
+    /* go over the triangle*/
+    goStraightTowards(0, l);
+    while ( 0 < l) {
+        goStraightTowards(120, l);
+        l = l - 1;
+    }
+    return true;
+}
+
+/* finds the remainder using for loop */
+function int remainder(int a, int b)
+{
+    if (b == 0)
+        return -1;
+    int rm = a;
+    while ( rm > b ) {
+        rm = rm - b;
+    }
+    return rm;
+}
+/* The following functions are reformatted from the project part 1 */
+
+/* At first, drone connected to wifi, than action has taken according to weather conditions*/
+/* Then drone spins 360 degrees, 
+finally it drows zig-zags in the field before going to sleep.*/
+function str setVerticalClimbOrSpray(int tempature)
+{
+	str returnMsg;
+	if(tempature <= 3){
+		int currAltitude = getAltitude();
+		if(currAltitude > 50){
+			setVerticalClimb(currAltitude - 35);
+		}
+		returnMsg = "Altitude decreased due to weather conditions";
+	}else{
+		setSpray(true);
+		returnMsg = "spray is setted to true";
+	}
+	return returnVal;
+}
+
+function void spin(){	
+	for( int i = 0; i < 360; i = i + 1){
+		setHorizontal(1);
+	}
+}
+
+function void zigzag(int value){
+	while(value < 100){
+		if(value / 2 == 0){
+			setHorizontal(1);
+			setHeading(1);
+		}else{
+			setHorizontal(-1);
+			setHeading(0);
+		}
+		value = value + 1;
+	}
+}
+
+
+function float floatChange(float val){
+	if(val >= 4 || val <= 2){
+		val = 5.5;
+	}
+	return val;
+}
+
+/*
+* it turns the heading of drone for 
+*   degree many degrees, and clockwise if isClockWise is true, 
+* counter clockwise otherwise.  
+*/
+function void turnFor(int degree, bool isClockWise) {
+    for(int i = 0; i < degree; i = i + 1) {
+        setHeading( !isClockWise);
+    }
+}
+
+/* 
+It simulates a robot dance.
+*/
+function void dance() {
+    for(int i = 0; i < 100; i = i+1) {
+        setVerticalClimb( 1);
+        turnFor(180, true);
+        sleep(1000);
+
+        setVerticalClimb( 0);
+        
+        setVerticalClimb( -1);
+        turnFor(180, false);
+        sleep(1000);        
+    }
+}

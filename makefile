@@ -16,10 +16,11 @@ l:
 	touch CS315f21_team40.lex
 y:
 	yacc CS315f21_team40.yacc
-new:
+archive:
 	#cp main.l "main.l.prev"
-	cp CS315f21_team40.lex ./archive/"main_$(DATE).l"
-	nano CS315f21_team40.lex
+	cp CS315f21_team40.lex ./archive/"CS315f21_team40_$(DATE).lex"
+	cp CS315f21_team40.yacc ./archive/"CS315f21_team40_$(DATE).yacc"
+
 clear:
 	rm -f  parser
 	rm -f  lex.yy.c
@@ -27,9 +28,9 @@ clear:
 	touch CS315f21_team40.lex
 
 test: compile
-	cat CS315f21_team40.test | ./parser
+	cat CS315f21_team40.txt | ./parser
 v: compile
-	cat CS315f21_team40.test | ./parser
+	cat CS315f21_team40.txt | ./parser
 i: compile
 	cat invalid | ./parser
 d:
