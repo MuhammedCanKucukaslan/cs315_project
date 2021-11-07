@@ -25,6 +25,12 @@ function int main (str args)
     setSpray(false);
     printOut( "done spraying the triangular area");
 
+    /* go over an octagone with given length */
+    goOverOctagon(length);
+    printOut( "done spraying the octagonal area");
+
+
+    /* if, else, and else if syntax test */
     if (b < 3)
     {
         printOut( "b is less than 3");
@@ -38,6 +44,13 @@ function int main (str args)
         printOut( "b is equal to 3");
     }
 
+    if (a + 3< 1+ 2)
+        printOut( "a + 3 is less than 1 + 2");
+    else if( a + 3 > 1+ 2)
+        printOut( "a + 3 is greater than 1 + 2");
+    else
+        printOut( "a + 3 is equal to 1 + 2");
+    
     /* Testing the methods */
     connect("eduroam", "password123");
 	int tempature = getTempature();
@@ -107,6 +120,41 @@ function bool goOverEquilateralTriangle(int length)
         l = l - 1;
     }
     return true;
+}
+
+/*
+* Traverse over an equilateral Octagone with edge length given in meters
+*/
+function void goOverOctagone(int length)
+{
+	setSpray(true);
+	/* first we will fill the 7 sides of the rectangle*/
+	for ( int k = 0; k < 7 ; k = k + 1){
+		for (int i = 0; i < length; i = i + 1) 
+		{
+       			sleep(1000); 
+   		}
+		for (int i = 0; i < 45; i = i + 1) 
+		{
+       			setHeading(true); 
+   		}
+	}
+	
+	/* now inside the loop it will spray smaller and smaller 
+	octagones inside the field*/
+	for(int j = length - 1; j > 0; j = j + 1){
+		for(int k = 0; k < 8; k= k + 1){
+			for (int i = 0; i < j; i = i + 1) 
+			{
+       				sleep(1000); 
+   			}
+			for (int i = 0; i < 45; i = i + 1) 
+			{
+       				setHeading(true); 
+   			}
+		}
+	}
+	setSpray(false);
 }
 
 /* finds the remainder using for loop */
