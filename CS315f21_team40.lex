@@ -4,6 +4,8 @@ LP        \(
 RP        \)
 LB        \{
 RB        \}
+LSB       \[
+RSB       \]
 LCOM      \/\*
 RCOM      \*\/
 DOT       [.]
@@ -81,7 +83,9 @@ MAIN              main
 {LP}  return(LP);     
 {RP}  return(RP);      
 {LB}  return(LB);     
-{RB}  return(RB);      
+{RB}  return(RB);       
+{LSB}  return(LSB);     
+{RSB}  return(RSB);      
 
 {IF}    return(IF);
 {WHILE} return(WHILE);
