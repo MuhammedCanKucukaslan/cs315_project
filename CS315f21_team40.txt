@@ -25,6 +25,19 @@ function int main (str args)
     setSpray(false);
     printOut( "done spraying the triangular area");
 
+    if (b < 3)
+    {
+        printOut( "b is less than 3");
+    }
+    else if( b > 3)
+    {
+        printOut( "b is greater than 3");
+    }
+    else
+    {
+        printOut( "b is equal to 3");
+    }
+
     /* Testing the methods */
     connect("eduroam", "password123");
 	int tempature = getTempature();
