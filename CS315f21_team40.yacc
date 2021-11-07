@@ -66,7 +66,7 @@
 
 %%
 
-//-------------------------------------------
+// -------------------------------------------
 // Statements
 PROGRAM : FUNCTIONS
 
@@ -83,7 +83,7 @@ STATEMENT : MATCHED
     | UNMATCHED
 
 
-//-------------------------------------------
+// -------------------------------------------
 // Conditional Statements
 MATCHED : IF LP LOGICAL_EXPRESSION RP  MATCHED ELSE MATCHED
     | NON_IF_STATEMENT
@@ -91,7 +91,7 @@ UNMATCHED : IF LP LOGICAL_EXPRESSION RP  STATEMENT
     | IF LP LOGICAL_EXPRESSION RP  MATCHED ELSE UNMATCHED
 // END OF Conditional Statements
 
-//-------------------------------------------
+// -------------------------------------------
 // Non-conditional Statements
 NON_IF_STATEMENT : ITERATIVE_STATEMENT // no SEMICOLON after loop: "while() { ... }"
     | LB STATEMENTS RB
@@ -106,34 +106,28 @@ NORMAL_STATEMENT :
     | FUNCTION_CALL
 // END OF Non-conditional Statements
 
-//-------------------------------------------
+// -------------------------------------------
 // Declaration
 DECLARATIVE_STATEMENT : TYPE VAR_NAME // combined with VARIABLE_DECLARATION
 // END OF Declaration
 
-//-------------------------------------------
+// -------------------------------------------
 // Loops- ITERATIVE_STATEMENT
 ITERATIVE_STATEMENT  :  WHILE LP  LOGICAL_EXPRESSION  RP  MATCHED // curly brackets are removed from the original grammar
     | FOR LP  NORMAL_STATEMENT SEMICOLON LOGICAL_EXPRESSION SEMICOLON NORMAL_STATEMENT RP MATCHED  // curly brackets are removed from the original grammar
 // END OF Loops
 
-//-------------------------------------------
+// -------------------------------------------
 // Assignment
-ASSIGNMENT_STATEMENT :  VAR_NAME ASSIGN_OP OR_EXPRESSION
+ASSIGNMENT_STATEMENT :  VAR_NAME ASSIGN_OP EXPRESSION
     | VAR_NAME ASSIGN_OP FUNCTION_CALL
-    | DECLARATIVE_STATEMENT ASSIGN_OP  OR_EXPRESSION
+    | DECLARATIVE_STATEMENT ASSIGN_OP  EXPRESSION
     | DECLARATIVE_STATEMENT ASSIGN_OP FUNCTION_CALL
-
-
 // END OF
 
-//-------------------------------------------
+// -------------------------------------------
 // Expressions
-// EXPRESSION :  LP EXPRESSION RP
-//    | LOGICAL_EXPRESSION
-    // | RELATIONAL_EXPRESSION // removed from original grammar. It it conflicts with LOGICAL_EXPRESSION > OR_EXPRESSION > AND_EXPRESSION > BOOLEAN_FACTOR >RELATIONAL_EXPRESSION
-//    | ARITHMETIC_EXPRESSION
-
+ EXPRESSION :  LOGICAL_EXPRESSION
 // END OF Expressions
 
 // Arithmetic
@@ -141,24 +135,21 @@ ARITHMETIC_EXPRESSION : ARITHMETIC_EXPRESSION ADDITIVE_OPERATOR TERM
 	| TERM
 TERM : TERM MULTIPLICATIVE_OPERATOR FACTOR
 	| FACTOR
-FACTOR : VALUE | LP OR_EXPRESSION RP
+FACTOR : VALUE 
+    | LP EXPRESSION RP
 
 ADDITIVE_OPERATOR : ADD | SUB
 MULTIPLICATIVE_OPERATOR :  MUL | DIV
 // END OF Arithmetic
 
 // Boolean
-LOGICAL_EXPRESSION :  OR_EXPRESSION
-	// | RELATIONAL_EXPRESSION // removed from original grammar, it conflicts with OR_EXPRESSION > AND_EXPRESSION > BOOLEAN_FACTOR >RELATIONAL_EXPRESSION
-
-OR_EXPRESSION :  AND_EXPRESSION OR OR_EXPRESSION
+LOGICAL_EXPRESSION :  AND_EXPRESSION OR LOGICAL_EXPRESSION
 	| AND_EXPRESSION
 AND_EXPRESSION : BOOLEAN_FACTOR AND AND_EXPRESSION
 	| BOOLEAN_FACTOR
 BOOLEAN_FACTOR : NOT BOOLEAN_FACTOR
     | RELATIONAL_EXPRESSION
-    | ARITHMETIC_EXPRESSION // replacing it with "LP RELATIONAL_EXPRESSION RP" will reduce the conflicts to 4sr/4rr @ from 6sr/20rr
-
+    | ARITHMETIC_EXPRESSION 
 // END OF BOOLEAN
 
 // Relation
@@ -185,7 +176,7 @@ CONSTANT: BOOLEAN_VAL | FLOAT_NUMBER | INTEGER | STRING
 
 BOOLEAN_VAL: TRUE | FALSE
 
-//-------------------------------------------
+// -------------------------------------------
 // Functions
 ARGUMENTS : TYPE VAR_NAME
     | ARGUMENTS COMMA TYPE VAR_NAME
@@ -200,10 +191,10 @@ FUNCTION_CALL : VAR_NAME LP   RP
     | VAR_NAME LP  PARAMETERS  RP
     | PRIMITIVE_FUNCTION_CALL
 
-RETURN_STATEMENT : RETURN  OR_EXPRESSION
+RETURN_STATEMENT : RETURN  EXPRESSION
     | RETURN FUNCTION_CALL // addition to original bnf grammar
 
-//-------------------------------------------
+// -------------------------------------------
 // Primitive Functions
 PRIMITIVE_FUNCTION_CALL : GET_HEADINGS LP  RP
     | GET_ALTITUDE LP  RP
@@ -212,10 +203,10 @@ PRIMITIVE_FUNCTION_CALL : GET_HEADINGS LP  RP
     | SET_HORIZONTAL LP ARITHMETIC_EXPRESSION RP
     | SET_HEADING LP LOGICAL_EXPRESSION RP
     | SET_SPRAY LP LOGICAL_EXPRESSION RP
-    | CONNECT LP  STRING  COMMA  STRING  RP
+    | CONNECT LP  EXPRESSION  COMMA  EXPRESSION  RP
     | SLEEP LP ARITHMETIC_EXPRESSION RP
     | SCAN_NEXT LP  RP
-    | PRINT_OUT LP  STRING RP
+    | PRINT_OUT LP  EXPRESSION RP
 
 %%
 
