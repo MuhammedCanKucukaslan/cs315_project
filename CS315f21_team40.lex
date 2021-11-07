@@ -23,6 +23,7 @@ LE        <=
 GT        >
 GE        >=
 EQ        ==
+NEQ       !=
 NOT       !
 ASSIGN_OP =
 
@@ -44,7 +45,7 @@ ELSE     else
 VOID     void
 
 INT      int
-FLOAT    float 
+FLOAT    float
 BOOL     bool
 STR      str
 TRUE     true
@@ -77,11 +78,11 @@ MAIN              main
 {DOT} return(DOT);
 
 {AND} return(AND);
-{OR}  return(OR);      
-{LP}  return(LP);     
-{RP}  return(RP);      
-{LB}  return(LB);     
-{RB}  return(RB);      
+{OR}  return(OR);
+{LP}  return(LP);
+{RP}  return(RP);
+{LB}  return(LB);
+{RB}  return(RB);
 
 {IF}    return(IF);
 {WHILE} return(WHILE);
@@ -108,7 +109,7 @@ MAIN              main
 {SCAN_NEXT} return(SCAN_NEXT);
 {PRINT_OUT} return(PRINT_OUT);
 
-   
+
 {INT}   return (INT);
 {FLOAT}   return(FLOAT);
 {BOOL}   return(BOOL);
@@ -130,9 +131,10 @@ MAIN              main
 {GT}  return(GT);
 {GE}  return(GE);
 {EQ}  return(EQ);
+{NEQ} return(NEQ);
 {NOT}  return(NOT);
 {SPACE} ;/* ignore the spaces return(SPACE); */
-\n      { extern int lineno; lineno++; 
+\n      { extern int lineno; lineno++;
         }
-%% 
+%%
 int yywrap() { return 1; }
