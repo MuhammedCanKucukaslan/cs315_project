@@ -72,7 +72,7 @@ MAIN              main
 
 "/*"           { BEGIN(COMMENT);}
 <COMMENT>"*/" { BEGIN(INITIAL); }
-<COMMENT>\n   { }
+<COMMENT>\n   { extern int lineno; lineno++;}
 <COMMENT>.    { }
 
 {DOT} return(DOT);
