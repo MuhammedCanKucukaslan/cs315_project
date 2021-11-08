@@ -21,10 +21,11 @@ archive:
 	cp CS315f21_team40.lex ./archive/"CS315f21_team40_$(DATE).lex"
 	cp CS315f21_team40.yacc ./archive/"CS315f21_team40_$(DATE).yacc"
 
-clear:
+clean:
 	rm -f  parser
 	rm -f  lex.yy.c
 	rm -f y.tab.c
+	rm -f y.output
 	touch CS315f21_team40.lex
 
 test: compile
