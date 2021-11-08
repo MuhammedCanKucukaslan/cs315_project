@@ -59,6 +59,8 @@ function int main (str args)
 	spin();
 	zigzag();
 	sleep(1);
+	printOut(scanNext());
+	int heading = getHeading();
     bool neq ;
     neq = a != c;
     return 0;
